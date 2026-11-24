@@ -46,15 +46,15 @@ export const CrearFormulaScreen = () => {
       });
 
       if (!resultado.success) {
-        alertError(resultado.message);
+        void alertError(resultado.message);
         return;
       }
 
-      alertSuccess('La fórmula fue registrada correctamente y está en revisión.');
-      navigate('/cliente/mis-formulas');
+      void alertSuccess('La fórmula fue registrada correctamente y está en revisión.');
+      void navigate('/cliente/mis-formulas');
     } catch (error) {
       console.error('Error subiendo fórmula:', error);
-      alertError(error?.message || 'No fue posible subir la fórmula.');
+      void alertError(error?.message || 'No fue posible subir la fórmula.');
     } finally {
       setSubiendo(false);
     }
@@ -102,9 +102,9 @@ export const CrearFormulaScreen = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
 
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <p className="block text-sm font-semibold text-gray-700 mb-2">
                 Fecha de creación
-              </label>
+              </p>
 
               <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 min-h-[48px]">
                 <i className="fa-solid fa-calendar text-[#B90F0F]"></i>
@@ -115,9 +115,9 @@ export const CrearFormulaScreen = () => {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <p className="block text-sm font-semibold text-gray-700 mb-2">
                 ¿Cuál es tu condición?
-              </label>
+              </p>
 
               <div className="relative">
                 <button
@@ -168,9 +168,9 @@ export const CrearFormulaScreen = () => {
             </div>
 
             <div className="md:col-span-2 mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <p className="block text-sm font-semibold text-gray-700 mb-2">
                 Descripción
-              </label>
+              </p>
 
               <button
                 type="button"
@@ -193,9 +193,9 @@ export const CrearFormulaScreen = () => {
           </div>
 
           <div className="mt-2">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <p className="block text-sm font-semibold text-gray-700 mb-2">
               Imagen de la fórmula
-            </label>
+            </p>
 
             <label className="flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 cursor-pointer hover:bg-red-50 hover:border-[#B90F0F] transition">
               <div className="w-14 h-14 rounded-xl bg-white border border-gray-200 flex items-center justify-center mb-3">
@@ -273,10 +273,13 @@ export const CrearFormulaScreen = () => {
 
       {mostrarDescripcion && (
         <div
+          role="presentation"
           className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4"
           onClick={() => setMostrarDescripcion(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setMostrarDescripcion(false)}
         >
           <div
+            role="presentation"
             className="bg-white rounded-2xl p-5 sm:p-6 w-full max-w-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -304,7 +307,6 @@ export const CrearFormulaScreen = () => {
               onChange={(e) => setDescripcion(e.target.value)}
               placeholder="Ej: Fórmula reciente"
               maxLength={200}
-              autoFocus
               className="w-full min-h-[140px] border border-gray-300 rounded-xl p-4 text-sm text-gray-700 outline-none resize-none focus:border-[#B90F0F] focus:ring-1 focus:ring-[#B90F0F]"
             />
 

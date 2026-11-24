@@ -17,7 +17,7 @@ const DetalleProductoAdmin = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) cargarDetalleProducto();
+    if (id) void cargarDetalleProducto();
     else setLoading(false);
   }, [id]);
 
@@ -46,13 +46,13 @@ const DetalleProductoAdmin = () => {
       const response = await productController.eliminarProducto(Number(id));
 
       if (response.success) {
-        alertSuccess('Producto eliminado correctamente');
-        navigate('/admin/inventario');
+        void alertSuccess('Producto eliminado correctamente');
+        void navigate('/admin/inventario');
       } else {
-        alertError(response.message || 'Error al eliminar');
+        void alertError(response.message || 'Error al eliminar');
       }
     } catch (error) {
-      alertError('No se pudo eliminar el producto');
+      void alertError('No se pudo eliminar el producto');
       console.error(error);
     } finally {
       setLoading(false);

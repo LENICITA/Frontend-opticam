@@ -40,17 +40,17 @@ export const RestablecerContraseña = () => {
     e.preventDefault();
 
     if (!token || token.trim() === '') {
-      alertWarning('Debes ingresar el enlace de recuperación que recibiste en el correo');
+      void alertWarning('Debes ingresar el enlace de recuperación que recibiste en el correo');
       return;
     }
 
     if (newPassword.length < 8) {
-      alertWarning('La contraseña debe tener al menos 8 caracteres');
+      void alertWarning('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alertWarning('Las contraseñas no coinciden');
+      void alertWarning('Las contraseñas no coinciden');
       return;
     }
 
@@ -59,13 +59,13 @@ export const RestablecerContraseña = () => {
       const result = await authController.resetearPassword(token, newPassword);
 
       if (result.success) {
-        alertSuccess('Contraseña actualizada exitosamente');
-        navigate('/login');
+        void alertSuccess('Contraseña actualizada exitosamente');
+        void navigate('/login');
       } else {
-        alertError(result.message || 'Error al actualizar la contraseña');
+        void alertError(result.message || 'Error al actualizar la contraseña');
       }
     } catch (error) {
-      alertError(error.response?.data?.message || 'Error al procesar la solicitud');
+      void alertError(error.response?.data?.message || 'Error al procesar la solicitud');
     } finally {
       setLoading(false);
     }
@@ -87,11 +87,12 @@ export const RestablecerContraseña = () => {
         <form onSubmit={handleSubmit}>
 
           <div>
-            <label className="block text-sm text-black mb-2 font-medium">
+            <label htmlFor="enlace" className="block text-sm text-black mb-2 font-medium">
               Enlace de recuperación
             </label>
 
             <textarea
+              id="enlace"
               value={token}
               onChange={(e) => handleTokenChange(e.target.value)}
               placeholder="Pega aquí el enlace que recibiste en el correo"
@@ -106,12 +107,13 @@ export const RestablecerContraseña = () => {
           </div>
 
           <div>
-            <label className="block text-sm text-black mb-2 font-medium">
+            <label htmlFor="Nueva-contrasena" className="block text-sm text-black mb-2 font-medium">
               Nueva contraseña
             </label>
 
             <div className="flex items-center border border-gray-300 rounded-xl bg-white focus-within:border-[#B90F0F] transition">
               <input
+                id="Nueva-contrasena"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Mínimo 8 caracteres"
                 value={newPassword}
@@ -135,11 +137,12 @@ export const RestablecerContraseña = () => {
           </div>
 
           <div className="mt-5">
-            <label className="block text-sm text-black mb-2 font-medium">
+            <label htmlFor="confirmar-contrasena" className="block text-sm text-black mb-2 font-medium">
               Confirmar contraseña
             </label>
 
             <input
+              id="confirmar-contrasena"
               type={showPassword ? 'text' : 'password'}
               placeholder="Repite tu nueva contraseña"
               value={confirmPassword}

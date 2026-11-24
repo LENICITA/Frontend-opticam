@@ -16,7 +16,7 @@ export const MisPedidosCliente = () => {
   const [selectedPedido, setSelectedPedido] = useState(null);
 
   useEffect(() => {
-    cargarPedidos();
+    void cargarPedidos();
   }, []);
 
   const cargarPedidos = async () => {
@@ -36,15 +36,15 @@ export const MisPedidosCliente = () => {
 
   const actualizarLista = () => {
     setActualizando(true);
-    cargarPedidos();
+    void cargarPedidos();
   };
 
   const irADetalle = (pedido) => {
     if (!pedido?.id_pedido) {
-      alertError('No se pudo identificar el pedido.');
+      void alertError('No se pudo identificar el pedido.');
       return;
     }
-    navigate(`/cliente/mis-pedidos/${pedido.id_pedido}`);
+    void navigate(`/cliente/mis-pedidos/${pedido.id_pedido}`);
   };
 
   const mostrarMenu = (pedido) => {
@@ -71,15 +71,15 @@ export const MisPedidosCliente = () => {
       const result = await pedidoController.cancelarPedido(selectedPedido.id_pedido);
 
       if (result.success) {
-        alertSuccess('Tu pedido ha sido cancelado exitosamente.');
+        void alertSuccess('Tu pedido ha sido cancelado exitosamente.');
         setPedidos((prev) => prev.filter((p) => p.id_pedido !== selectedPedido.id_pedido));
         cerrarMenu();
       } else {
-        alertError(result.message || 'No se pudo cancelar el pedido');
+        void alertError(result.message || 'No se pudo cancelar el pedido');
       }
     } catch (error) {
       console.error('Error cancelando pedido:', error);
-      alertError(error.message || 'Error al cancelar el pedido');
+      void alertError(error.message || 'Error al cancelar el pedido');
     }
   };
 
@@ -239,7 +239,7 @@ export const MisPedidosCliente = () => {
               </p>
 
               <button
-                onClick={() => navigate('/catalogo')}
+                onClick={() => void navigate('/catalogo')}
                 className="mt-6 bg-[#B90F0F] text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-[#9f0d0d] transition flex items-center gap-2"
               >
                 <i className="fa-solid fa-glasses"></i>
@@ -272,8 +272,16 @@ export const MisPedidosCliente = () => {
 
                 return (
                   <div
+                    role="button"
+                    tabIndex={0}
                     key={item.id_pedido}
                     onClick={() => irADetalle(item)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        irADetalle(item);
+                      }
+                    }}
                     className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-gray-300 transition cursor-pointer relative"
                   >
                     {puedeCancelar && (
@@ -408,7 +416,7 @@ export const MisPedidosCliente = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/cliente/pagos/${item.id_pedido}`);
+                            void navigate(`/cliente/pagos/${item.id_pedido}`);
                           }}
                           className={`flex-1 h-11 rounded-xl text-white font-bold text-sm transition flex items-center justify-center gap-2 ${
                             item.estado === 'Listo'
@@ -440,12 +448,16 @@ export const MisPedidosCliente = () => {
 
         {menuVisible && (
           <div
+            role="presentation"
             className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4"
             onClick={cerrarMenu}
+            onKeyDown={(e) => e.key === 'Escape' && cerrarMenu()}
           >
             <div
+              role="presentation"
               className="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl"
               onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-5">
                 <div>

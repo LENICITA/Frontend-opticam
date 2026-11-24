@@ -73,8 +73,8 @@ export const AutoRegistro = () => {
       const result = await register(userData);
 
       if (result.success) {
-        alertSuccess('¡Éxito! Cuenta creada correctamente. Por favor inicia sesión.');
-        navigate('/login');
+        void alertSuccess('¡Éxito! Cuenta creada correctamente. Por favor inicia sesión.');
+        void navigate('/login');
       } else {
         setError(result.message || 'Error al registrar usuario.');
       }
@@ -114,11 +114,12 @@ export const AutoRegistro = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
 
             <div>
-              <label className="block text-black text-sm font-medium mb-2">
+              <label htmlFor="nombre" className="block text-black text-sm font-medium mb-2">
                 Nombres y Apellidos <span className="text-red-600">*</span>
               </label>
 
               <input
+                id="nombre"
                 type="text"
                 value={formData.nombre_completo}
                 onChange={(e) =>
@@ -130,11 +131,12 @@ export const AutoRegistro = () => {
             </div>
 
             <div>
-              <label className="block text-black text-sm font-medium mb-2">
+              <label htmlFor="email" className="block text-black text-sm font-medium mb-2">
                 Email <span className="text-red-600">*</span>
               </label>
 
               <input
+                id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) =>
@@ -147,11 +149,12 @@ export const AutoRegistro = () => {
             </div>
 
             <div>
-              <label className="block text-black text-sm font-medium mb-2">
+              <label htmlFor="documento" className="block text-black text-sm font-medium mb-2">
                 Documento
               </label>
 
               <input
+                id="documento"
                 type="text"
                 value={formData.documento}
                 onChange={(e) =>
@@ -163,11 +166,12 @@ export const AutoRegistro = () => {
             </div>
 
             <div>
-              <label className="block text-black text-sm font-medium mb-2">
+              <label htmlFor="fecha-nacimiento" className="block text-black text-sm font-medium mb-2">
                 Fecha de nacimiento
               </label>
 
               <input
+                id="fecha-nacimiento"
                 type="date"
                 value={formData.fecha_nacimiento}
                 onChange={(e) =>
@@ -179,11 +183,12 @@ export const AutoRegistro = () => {
             </div>
 
             <div>
-              <label className="block text-black text-sm font-medium mb-2">
+              <label htmlFor="ciudad" className="block text-black text-sm font-medium mb-2">
                 Ciudad
               </label>
 
               <input
+                id="ciudad"
                 type="text"
                 value={formData.ciudad}
                 onChange={(e) =>
@@ -195,11 +200,12 @@ export const AutoRegistro = () => {
             </div>
 
             <div>
-              <label className="block text-black text-sm font-medium mb-2">
+              <label htmlFor="Telefono" className="block text-black text-sm font-medium mb-2">
                 Teléfono
               </label>
 
               <input
+                id="Telefono"
                 type="tel"
                 value={formData.telefono}
                 onChange={(e) =>
@@ -213,11 +219,12 @@ export const AutoRegistro = () => {
           </div>
 
           <div className="mt-5">
-            <label className="block text-black text-sm font-medium mb-2">
+            <label htmlFor="direccion" className="block text-black text-sm font-medium mb-2">
               Dirección
             </label>
 
             <input
+              id="direccion"
               type="text"
               value={formData.direccion}
               onChange={(e) =>
@@ -231,12 +238,13 @@ export const AutoRegistro = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mt-5">
 
             <div>
-              <label className="block text-black text-sm font-medium mb-2">
+              <label htmlFor="contrasena" className="block text-black text-sm font-medium mb-2">
                 Contraseña <span className="text-red-600">*</span>
               </label>
 
               <div className="relative w-full">
                 <input
+                  id="contrasena"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.contrasena}
                   onChange={(e) =>

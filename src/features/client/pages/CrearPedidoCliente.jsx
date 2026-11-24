@@ -8,6 +8,14 @@ import { UserController } from '../../../core/controllers/UserController';
 import { validarFormularioPedido } from '../../../shared/validators/pedidoValidators';
 import { alertError, alertSuccess, alertWarning } from '../../../shared/utils/alert';
 
+// Helper: número entero aleatorio criptográficamente seguro en [min, max]
+function randomIntSeguro(min, max) {
+  const range = max - min + 1;
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return min + (array[0] % range);
+}
+
 export const CrearPedidoCliente = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -34,7 +42,7 @@ export const CrearPedidoCliente = () => {
   const userController = new UserController();
 
   useEffect(() => {
-    cargarDatos();
+    void cargarDatos();
   }, []);
 
   const cargarDatos = async () => {
@@ -45,8 +53,8 @@ export const CrearPedidoCliente = () => {
       const productosData = carritoGuardado ? JSON.parse(carritoGuardado) : [];
 
       if (productosData.length === 0) {
-        alertWarning('No hay productos seleccionados');
-        navigate('/carrito');
+        void alertWarning('No hay productos seleccionados');
+        void navigate('/carrito');
         return;
       }
 
@@ -62,12 +70,12 @@ export const CrearPedidoCliente = () => {
       }
 
       const fecha = new Date();
-      const dias = 8 + Math.floor(Math.random() * 3);
+      const dias = randomIntSeguro(8, 10);   // ✅ PRNG seguro
       fecha.setDate(fecha.getDate() + dias);
       setFechaEstimada(fecha.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }));
     } catch (error) {
       console.error('Error cargando datos:', error);
-      alertError('Error al cargar los datos');
+      void alertError('Error al cargar los datos');
     } finally {
       setLoading(false);
     }
@@ -135,7 +143,7 @@ export const CrearPedidoCliente = () => {
     });
 
     if (!check.valido) {
-      alertWarning(check.mensaje || 'Datos inválidos');
+      void alertWarning(check.mensaje || 'Datos inválidos');
       return;
     }
 
@@ -155,14 +163,14 @@ export const CrearPedidoCliente = () => {
         localStorage.removeItem('@carrito');
         localStorage.removeItem('carrito_seleccionado');
 
-        alertSuccess('Tu pedido ha sido creado exitosamente.');
-        navigate(`/cliente/mis-pedidos`);
+        void alertSuccess('Tu pedido ha sido creado exitosamente.');
+        void navigate(`/cliente/mis-pedidos`);
       } else {
-        alertError(result.message || 'Error al crear el pedido');
+        void alertError(result.message || 'Error al crear el pedido');
       }
     } catch (error) {
       console.error('Error creando pedido:', error);
-      alertError(error.message || 'Error al crear el pedido');
+      void alertError(error.message || 'Error al crear el pedido');
     } finally {
       setEnviando(false);
     }
@@ -291,11 +299,12 @@ export const CrearPedidoCliente = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="direccion" className="block text-sm font-semibold text-gray-700 mb-2">
                     Dirección *
                   </label>
 
                   <input
+                    id="direccion"
                     type="text"
                     placeholder="Calle, número, barrio..."
                     value={direccion}
@@ -306,9 +315,9 @@ export const CrearPedidoCliente = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <p className="block text-sm font-semibold text-gray-700 mb-2">
                     Ciudad de envío *
-                  </label>
+                  </p>
 
                   <input
                     type="text"

@@ -35,8 +35,8 @@ const DetallePedidosAdmin = () => {
 
   const cargarPedido = useCallback(async () => {
     if (!id_pedido) {
-      alertError('No se recibió el identificador del pedido.');
-      navigate(-1);
+      void alertError('No se recibió el identificador del pedido.');
+      void navigate(-1);
       return;
     }
 
@@ -48,15 +48,15 @@ const DetallePedidosAdmin = () => {
         const pedidoCliente = misPedidos.find((item) => Number(item.id_pedido) === Number(id_pedido));
 
         if (!pedidoCliente) {
-          alertError('No puedes consultar este pedido porque no pertenece a tu cuenta.');
-          navigate(-1);
+          void alertError('No puedes consultar este pedido porque no pertenece a tu cuenta.');
+          void navigate(-1);
           return;
         }
 
         const detalle = await pedidoController.getPedidoById(Number(id_pedido));
         if (!detalle) {
-          alertError('No fue posible encontrar el pedido.');
-          navigate(-1);
+          void alertError('No fue posible encontrar el pedido.');
+          void navigate(-1);
           return;
         }
         setPedido(detalle);
@@ -66,39 +66,38 @@ const DetallePedidosAdmin = () => {
       const detalle = await pedidoController.getPedidoById(Number(id_pedido));
 
       if (!detalle) {
-        alertError('No fue posible encontrar el pedido.');
-        navigate(-1);
+        void alertError('No fue posible encontrar el pedido.');
+        void navigate(-1);
         return;
       }
 
       if (!ESTADOS_ACTIVOS.includes(detalle.estado)) {
-        alertError('El administrador solo puede consultar pedidos activos.');
-        navigate(-1);
+        void alertError('El administrador solo puede consultar pedidos activos.');
+        void navigate(-1);
         return;
       }
 
       setPedido(detalle);
     } catch (error) {
       console.error('Error cargando detalle del pedido:', error);
-      alertError('No fue posible cargar la información del pedido.');
+      void alertError('No fue posible cargar la información del pedido.');
     } finally {
       setLoading(false);
     }
   }, [id_pedido, esAdmin, navigate]);
 
   useEffect(() => {
-    cargarPedido();
+    void cargarPedido();
   }, [cargarPedido]);
 
   const marcarComoListo = async () => {
     if (!pedido) return;
 
     if (pedido.estado !== 'Abonado') {
-      alertError('El pedido debe estar en estado ABONADO.');
+      void alertError('El pedido debe estar en estado ABONADO.');
       return;
     }
 
-    // ✅ window.confirm reemplazado por alertConfirm
     const confirmado = await alertConfirm({
       title: '¿Marcar pedido como LISTO?',
       text: '¿Estás seguro de que las gafas ya están listas para que el cliente pague el saldo restante?',
@@ -111,16 +110,15 @@ const DetallePedidosAdmin = () => {
       const resultado = await pedidoController.marcarPedidoComoListo(Number(pedido.id_pedido));
 
       if (!resultado.success) {
-        alertError(resultado.message || 'No fue posible marcar el pedido como LISTO.');
+        void alertError(resultado.message || 'No fue posible marcar el pedido como LISTO.');
         return;
       }
 
-      // ✅ éxito → alertSuccess (antes estaba como alertError)
-      alertSuccess(resultado.message || 'El pedido ha sido marcado como LISTO.');
+      void alertSuccess(resultado.message || 'El pedido ha sido marcado como LISTO.');
       await cargarPedido();
     } catch (error) {
       console.error('Error marcando pedido como LISTO:', error);
-      alertError(
+      void alertError(
         error?.response?.data?.message ||
         error?.message ||
         'No fue posible marcar el pedido como LISTO.'
@@ -134,7 +132,7 @@ const DetallePedidosAdmin = () => {
     if (!pedido) return;
 
     if (!ESTADOS_EDITABLES.includes(pedido.estado)) {
-      alertError(
+      void alertError(
         `El pedido está en estado "${pedido.estadoDisplay}". Solo se puede editar cuando está en: Abonado, Listo, Pagado o En Proceso.`
       );
       return;
@@ -143,12 +141,12 @@ const DetallePedidosAdmin = () => {
     let fechaInicial = '';
     if (pedido.fecha_estimada) {
       const fecha = new Date(pedido.fecha_estimada);
-      if (!isNaN(fecha.getTime())) fechaInicial = fecha.toISOString().split('T')[0];
+      if (!Number.isNaN(fecha.getTime())) fechaInicial = fecha.toISOString().split('T')[0];
     }
 
     setFechaEstimadaInput(fechaInicial);
     const fechaCalendario = fechaInicial ? new Date(`${fechaInicial}T00:00:00`) : new Date();
-    setMesCalendario(isNaN(fechaCalendario.getTime()) ? new Date() : fechaCalendario);
+    setMesCalendario(Number.isNaN(fechaCalendario.getTime()) ? new Date() : fechaCalendario);
     setModalFechaEstimada(true);
   };
 
@@ -216,13 +214,13 @@ const DetallePedidosAdmin = () => {
     const fecha = fechaEstimadaInput.trim();
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-      alertMessage('Selecciona una fecha en el calendario.');
+      void alertMessage('Selecciona una fecha en el calendario.');
       return;
     }
 
     const fechaComprobacion = new Date(`${fecha}T00:00:00`);
-    if (isNaN(fechaComprobacion.getTime()) || esFechaAnteriorAHoy(fechaComprobacion)) {
-      alertMessage('Selecciona hoy o una fecha posterior.');
+    if (Number.isNaN(fechaComprobacion.getTime()) || esFechaAnteriorAHoy(fechaComprobacion)) {
+      void alertMessage('Selecciona hoy o una fecha posterior.');
       return;
     }
 
@@ -231,18 +229,16 @@ const DetallePedidosAdmin = () => {
       const resultado = await pedidoController.actualizarFechaEstimada(Number(pedido.id_pedido), fecha);
 
       if (!resultado.success) {
-        alertError(resultado.message || 'No fue posible actualizar la fecha estimada.');
+        void alertError(resultado.message || 'No fue posible actualizar la fecha estimada.');
         return;
       }
 
       setModalFechaEstimada(false);
-      // ✅ alert() reemplazado por alertSuccess
-      alertSuccess(resultado.message || 'La fecha estimada del pedido fue actualizada correctamente.');
+      void alertSuccess(resultado.message || 'La fecha estimada del pedido fue actualizada correctamente.');
       await cargarPedido();
     } catch (error) {
       console.error('Error actualizando fecha estimada:', error);
-      // ✅ alert() reemplazado por alertError
-      alertError(
+      void alertError(
         error?.response?.data?.message ||
         error?.message ||
         'No fue posible actualizar la fecha estimada.'
@@ -313,8 +309,10 @@ const DetallePedidosAdmin = () => {
       {/* VISOR IMAGEN */}
       {imagenAmpliada && (
         <div
+          role="presentation"
           className="fixed inset-0 bg-black/95 z-[1000] flex items-center justify-center"
           onClick={() => setImagenAmpliada(null)}
+          onKeyDown={(e) => e.key === 'Escape' && setImagenAmpliada(null)}
         >
           <button className="absolute top-6 right-5 p-2.5 rounded-full bg-white/15 z-10">
             <i className="fa-solid fa-xmark text-white text-3xl"></i>
@@ -335,12 +333,20 @@ const DetallePedidosAdmin = () => {
       {/* MODAL FECHA */}
       {modalFechaEstimada && (
         <div
+          role="presentation"
           className="fixed inset-0 bg-black/45 z-[1000] flex items-center justify-center px-4 sm:px-6"
           onClick={() => !guardandoFechaEstimada && setModalFechaEstimada(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && !guardandoFechaEstimada) {
+              setModalFechaEstimada(false);
+            }
+          }}
         >
           <div
+            role="presentation"
             className="w-full max-w-[420px] bg-white rounded-2xl p-[18px] shadow-xl"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             <div className="flex items-center mb-5">
               <div className="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center mr-3">

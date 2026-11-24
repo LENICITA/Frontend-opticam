@@ -1,4 +1,3 @@
-// src/core/controllers/AuthController.js
 import { AuthService } from '../services/AuthService';
 import { UserRepository } from '../repositories/UserRepository';
 import { UserModel } from '../../shared/types/UserModel';
@@ -10,81 +9,107 @@ export class AuthController {
     this.userRepository = new UserRepository();
   }
 
-  // ===== LOGIN =====
+  _normalizarRoles(roles) {
+    let rolesArray = [];
+    if (Array.isArray(roles)) {
+      rolesArray = roles.map((r) =>
+        typeof r === 'string' ? r : r.nombre || r.rol || r
+      );
+    } else if (roles) {
+      rolesArray = [roles];
+    } else {
+      rolesArray = ['CLIENTE'];
+    }
+    return rolesArray.map((role) => role.toUpperCase());
+  }
+
+  async _procesarSesionAutenticada({ token, usuario }) {
+    const tokenString = typeof token === 'string' ? token : token?.token;
+    if (!tokenString) {
+      return { success: false, message: 'No se recibió un token válido' };
+    }
+
+    const rolesArray = this._normalizarRoles(usuario.roles);
+
+    const userModel = UserModel.fromJSON({
+      id_usuario: usuario.id,
+      nombre_completo: usuario.nombre_completo,
+      email: usuario.email,
+      telefono: usuario.telefono || '',
+      ciudad: usuario.ciudad || '',
+      direccion: '',
+      documento: 0,
+      fecha_nacimiento: '',
+      fecha_registro: '',
+      estado: 'ACTIVO',
+      roles: rolesArray,
+    });
+
+    await this.userRepository.saveToken(tokenString);
+    await this.userRepository.saveUser(userModel);
+
+    return { success: true, user: userModel, token };
+  }
+
+  _mapearUsuarioDesdeBackend(userData) {
+    return UserModel.fromJSON({
+      id_usuario: userData.id,
+      nombre_completo: userData.nombre_completo,
+      email: userData.email,
+      telefono: userData.telefono || '',
+      direccion: userData.direccion || '',
+      ciudad: userData.ciudad || '',
+      documento: userData.documento || 0,
+      fecha_nacimiento: userData.fecha_nacimiento || '',
+      fecha_registro: '',
+      estado: userData.estado || 'ACTIVO',
+      roles: userData.roles || [],
+    });
+  }
+
+  _manejarErrorAuth(error, mensajePorDefecto, mensajesPorStatus = {}) {
+    console.error(`${mensajePorDefecto}:`, error);
+    let message = mensajePorDefecto;
+
+    const status = error.response?.status;
+    if (status && mensajesPorStatus[status]) {
+      message = error.response?.data?.message || mensajesPorStatus[status];
+    } else if (error.response?.data?.message) {
+      message = error.response.data.message;
+    }
+
+    return { success: false, message };
+  }
+
   async login(email, password) {
     try {
       if (!email || !password) {
         return { success: false, message: 'Email y contraseña son requeridos' };
       }
 
-      const response = await this.authService.login(email.trim().toLowerCase(), password);
+      const response = await this.authService.login(
+        email.trim().toLowerCase(),
+        password
+      );
 
       if (!response.success) {
-        return { success: false, message: response.message || 'Credenciales inválidas' };
+        return {
+          success: false,
+          message: response.message || 'Credenciales inválidas',
+        };
       }
 
-      const { token, usuario } = response.data;
-
-      const tokenString = typeof token === 'string' ? token : token?.token;
-      if (!tokenString) {
-        return { success: false, message: 'No se recibió un token válido' };
-      }
-
-      let rolesArray = [];
-      if (Array.isArray(usuario.roles)) {
-        rolesArray = usuario.roles.map((r) =>
-          typeof r === 'string' ? r : r.nombre || r.rol || r
-        );
-      } else if (usuario.roles) {
-        rolesArray = [usuario.roles];
-      } else {
-        rolesArray = ['CLIENTE'];
-      }
-      rolesArray = rolesArray.map((role) => role.toUpperCase());
-
-      const userData = {
-        id_usuario: usuario.id,
-        nombre_completo: usuario.nombre_completo,
-        email: usuario.email,
-        telefono: usuario.telefono || '',
-        ciudad: usuario.ciudad || '',
-        direccion: '',
-        documento: 0,
-        fecha_nacimiento: '',
-        fecha_registro: '',
-        estado: 'ACTIVO',
-        roles: rolesArray,
-      };
-
-      const userModel = UserModel.fromJSON(userData);
-
-      await this.userRepository.saveToken(tokenString);
-      await this.userRepository.saveUser(userModel);
-
-      return {
-        success: true,
-        user: userModel,
-        token: token,
-      };
-
+      return await this._procesarSesionAutenticada(response.data);
     } catch (error) {
-      console.error(' Error en login:', error);
-      let message = 'Error al iniciar sesión';
-      if (error.response?.status === 401) {
-        message = error.response?.data?.message || 'Credenciales inválidas';
-      } else if (error.response?.status === 403) {
-        message = error.response?.data?.message || 'Usuario inactivo';
-      } else if (error.response?.data?.message) {
-        message = error.response.data.message;
-      }
-      return { success: false, message };
+      return this._manejarErrorAuth(error, 'Error al iniciar sesión', {
+        401: 'Credenciales inválidas',
+        403: 'Usuario inactivo',
+      });
     }
   }
 
-  // ===== REGISTER =====
   async register(userData) {
     try {
-      // Validación con el validador compartido
       const check = validarFormularioCliente({
         nombre_completo: userData.nombre_completo,
         telefono: userData.telefono,
@@ -109,82 +134,35 @@ export class AuthController {
       const response = await this.authService.register(dataToSend);
 
       if (!response.success) {
-        return { success: false, message: response.message || 'Error al registrar usuario' };
+        return {
+          success: false,
+          message: response.message || 'Error al registrar usuario',
+        };
       }
 
-      const { token, usuario } = response.data;
-
-      const tokenString = typeof token === 'string' ? token : token?.token;
-      if (!tokenString) {
-        return { success: false, message: 'No se recibió un token válido' };
-      }
-
-      let rolesArray = [];
-      if (Array.isArray(usuario.roles)) {
-        rolesArray = usuario.roles.map((r) =>
-          typeof r === 'string' ? r : r.nombre || r.rol || r
-        );
-      } else if (usuario.roles) {
-        rolesArray = [usuario.roles];
-      } else {
-        rolesArray = ['CLIENTE'];
-      }
-      rolesArray = rolesArray.map((role) => role.toUpperCase());
-
-      const userModel = UserModel.fromJSON({
-        id_usuario: usuario.id,
-        nombre_completo: usuario.nombre_completo,
-        email: usuario.email,
-        telefono: usuario.telefono || '',
-        ciudad: usuario.ciudad || '',
-        direccion: '',
-        documento: 0,
-        fecha_nacimiento: '',
-        fecha_registro: '',
-        estado: 'ACTIVO',
-        roles: rolesArray,
-      });
-
-      await this.userRepository.saveToken(tokenString);
-      await this.userRepository.saveUser(userModel);
-
-      return {
-        success: true,
-        user: userModel,
-        token: token,
-      };
-
+      return await this._procesarSesionAutenticada(response.data);
     } catch (error) {
-      console.error(' Error en register:', error);
-      let message = 'Error al registrar usuario';
-      if (error.response?.status === 400) {
-        message = error.response?.data?.message || 'Datos inválidos. Verifica los campos.';
-      } else if (error.response?.status === 409) {
-        message = error.response?.data?.message || 'El email o documento ya está registrado.';
-      } else if (error.response?.data?.message) {
-        message = error.response.data.message;
-      }
-      return { success: false, message };
+      return this._manejarErrorAuth(error, 'Error al registrar usuario', {
+        400: 'Datos inválidos. Verifica los campos.',
+        409: 'El email o documento ya está registrado.',
+      });
     }
   }
 
-  // ===== LOGOUT =====
   async logout() {
     try {
       await this.userRepository.clearSession();
       try {
         await this.authService.logout();
       } catch (e) {
-        // Ignorar errores del backend
       }
       return { success: true, message: 'Sesión cerrada correctamente' };
     } catch (error) {
-      console.error(' Error en logout:', error);
+      console.error('Error en logout:', error);
       return { success: false, message: 'Error al cerrar sesión' };
     }
   }
 
-  // ===== CARGAR USUARIO =====
   async loadUser() {
     try {
       const token = await this.userRepository.getToken();
@@ -194,54 +172,42 @@ export class AuthController {
       if (storedUser) return storedUser;
 
       const response = await this.authService.verifyToken();
-
       if (response.success && response.data?.usuario) {
-        const userData = response.data.usuario;
-        const userModel = UserModel.fromJSON({
-          id_usuario: userData.id,
-          nombre_completo: userData.nombre_completo,
-          email: userData.email,
-          telefono: userData.telefono || '',
-          direccion: userData.direccion || '',
-          ciudad: userData.ciudad || '',
-          documento: userData.documento || 0,
-          fecha_nacimiento: userData.fecha_nacimiento || '',
-          fecha_registro: '',
-          estado: userData.estado || 'ACTIVO',
-          roles: userData.roles || [],
-        });
+        const userModel = this._mapearUsuarioDesdeBackend(response.data.usuario);
         await this.userRepository.saveUser(userModel);
         return userModel;
       }
+
       return null;
     } catch (error) {
-      console.error(' Error en loadUser:', error);
+      console.error('Error en loadUser:', error);
       await this.userRepository.clearSession();
       return null;
     }
   }
 
-  // ===== RECUPERAR CONTRASEÑA =====
   async solicitarRecuperacion(email) {
     try {
-      const response = await this.authService.solicitarRecuperacion(email.trim().toLowerCase());
+      const response = await this.authService.solicitarRecuperacion(
+        email.trim().toLowerCase()
+      );
+
       if (!response.success) {
-        return { success: false, message: response.message || 'Error al enviar el correo' };
+        return {
+          success: false,
+          message: response.message || 'Error al enviar el correo',
+        };
       }
+
       return {
         success: true,
         message: response.message || 'Correo enviado correctamente',
         token: response.token,
       };
     } catch (error) {
-      console.error(' Error en solicitarRecuperacion:', error);
-      let message = 'Error al procesar la solicitud';
-      if (error.response?.status === 404) {
-        message = 'No existe una cuenta con este email';
-      } else if (error.response?.data?.message) {
-        message = error.response.data.message;
-      }
-      return { success: false, message };
+      return this._manejarErrorAuth(error, 'Error al procesar la solicitud', {
+        404: 'No existe una cuenta con este email',
+      });
     }
   }
 
@@ -250,17 +216,23 @@ export class AuthController {
       if (!token) {
         return { success: false, message: 'Token requerido' };
       }
+
       const response = await this.authService.verificarTokenRecuperacion(token);
+
       if (!response.success) {
-        return { success: false, message: response.message || 'Token inválido o expirado' };
+        return {
+          success: false,
+          message: response.message || 'Token inválido o expirado',
+        };
       }
+
       return {
         success: true,
         message: response.message || 'Token válido',
         data: response.data,
       };
     } catch (error) {
-      console.error(' Error en verificarTokenRecuperacion:', error);
+      console.error('Error en verificarTokenRecuperacion:', error);
       return {
         success: false,
         message: error.response?.data?.message || 'Error al verificar el token',
@@ -271,30 +243,43 @@ export class AuthController {
   async resetearPassword(token, nuevaContrasena) {
     try {
       if (!token || !nuevaContrasena) {
-        return { success: false, message: 'Token y nueva contraseña son requeridos' };
-      }
-      if (nuevaContrasena.length < 8) {
-        return { success: false, message: 'La contraseña debe tener al menos 8 caracteres' };
+        return {
+          success: false,
+          message: 'Token y nueva contraseña son requeridos',
+        };
       }
 
-      const response = await this.authService.resetearPassword(token, nuevaContrasena);
-      if (!response.success) {
-        return { success: false, message: response.message || 'Error al resetear la contraseña' };
+      if (nuevaContrasena.length < 8) {
+        return {
+          success: false,
+          message: 'La contraseña debe tener al menos 8 caracteres',
+        };
       }
+
+      const response = await this.authService.resetearPassword(
+        token,
+        nuevaContrasena
+      );
+
+      if (!response.success) {
+        return {
+          success: false,
+          message: response.message || 'Error al resetear la contraseña',
+        };
+      }
+
       return {
         success: true,
         message: response.message || 'Contraseña actualizada correctamente',
       };
     } catch (error) {
-      console.error(' Error en resetearPassword:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Error al resetear la contraseña',
-      };
+      return this._manejarErrorAuth(
+        error,
+        'Error al resetear la contraseña'
+      );
     }
   }
 
-  // ===== VERIFICAR TOKEN =====
   async verifyToken() {
     try {
       const response = await this.authService.verifyToken();
@@ -306,7 +291,7 @@ export class AuthController {
         data: response.data,
       };
     } catch (error) {
-      console.error(' Error en verifyToken:', error);
+      console.error('Error en verifyToken:', error);
       return { success: false };
     }
   }

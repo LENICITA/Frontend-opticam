@@ -37,7 +37,7 @@ export const MENSAJES_DISTRIBUCION = {
 export const validarId = (id) => {
   if (id === undefined || id === null || id === '') return false;
   const num = Number(id);
-  return !isNaN(num) && num > 0 && Number.isInteger(num);
+  return !Number.isNaN(num) && num > 0 && Number.isInteger(num);
 };
 
 export const validarObservacion = (obs) => {

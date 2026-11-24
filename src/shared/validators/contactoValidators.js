@@ -10,7 +10,7 @@ export const CONTACTO_LIMITS = {
   MENSAJE_MAX: 1000
 };
 
-export const REGEX_EMAIL_CONTACTO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const REGEX_EMAIL_CONTACTO = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const REGEX_TELEFONO_CONTACTO = /^[0-9+\-\s()]{7,20}$/;
 
 // MENSAJES DE ERROR

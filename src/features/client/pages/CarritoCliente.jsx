@@ -111,7 +111,7 @@ export const CarritoCliente = () => {
   const eliminarSeleccionados = async () => {
     const seleccionados = carrito.filter((item) => item.seleccionado);
     if (seleccionados.length === 0) {
-      alertWarning('No hay productos seleccionados');
+      void alertWarning('No hay productos seleccionados');
       return;
     }
 
@@ -128,7 +128,7 @@ export const CarritoCliente = () => {
 
   const vaciarCarrito = async () => {
     if (carrito.length === 0) {
-      alertWarning('El carrito ya está vacío');
+      void alertWarning('El carrito ya está vacío');
       return;
     }
 
@@ -146,12 +146,12 @@ export const CarritoCliente = () => {
     const productosSeleccionados = carrito.filter((item) => item.seleccionado);
 
     if (productosSeleccionados.length === 0) {
-      alertWarning('Selecciona al menos un producto para continuar');
+      void alertWarning('Selecciona al menos un producto para continuar');
       return;
     }
 
     localStorage.setItem('carrito_seleccionado', JSON.stringify(productosSeleccionados));
-    navigate('/cliente/crear-pedido');
+    void navigate('/cliente/crear-pedido');
   };
 
   const productosSeleccionados = carrito.filter((item) => item.seleccionado);

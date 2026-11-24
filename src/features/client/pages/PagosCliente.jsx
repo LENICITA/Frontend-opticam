@@ -23,11 +23,11 @@ export const PagosCliente = () => {
 
   useEffect(() => {
     if (!id) {
-      alertError('No se encontró el ID del pedido');
-      navigate(-1);
+      void alertError('No se encontró el ID del pedido');
+      void navigate(-1);
       return;
     }
-    cargarDatos();
+    void cargarDatos();
   }, [id]);
 
   const cargarDatos = async () => {
@@ -47,7 +47,7 @@ export const PagosCliente = () => {
       setPagos(pagosData);
     } catch (error) {
       console.error('Error cargando datos:', error);
-      alertError('Error al cargar los datos del pago');
+      void alertError('Error al cargar los datos del pago');
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export const PagosCliente = () => {
   const handlePagar = async (eleccion) => {
     try {
       if (!id) {
-        alertError('No se encontró el ID del pedido');
+        void alertError('No se encontró el ID del pedido');
         return;
       }
 
@@ -64,7 +64,7 @@ export const PagosCliente = () => {
       const saldoPendiente = saldo?.saldo_pendiente || total;
 
       if (total <= 0) {
-        alertError('El total del pedido no es válido');
+        void alertError('El total del pedido no es válido');
         return;
       }
 
@@ -72,7 +72,7 @@ export const PagosCliente = () => {
 
       if (eleccion === '50%') {
         if (saldo?.tiene_abono_50) {
-          alertError('Ya tienes un abono del 50%. Puedes pagar el saldo restante con "Pagar 100%"');
+          void alertError('Ya tienes un abono del 50%. Puedes pagar el saldo restante con "Pagar 100%"');
           return;
         }
         monto = Math.round(total / 2);
@@ -81,7 +81,7 @@ export const PagosCliente = () => {
       }
 
       if (monto <= 0) {
-        alertError(`El monto a pagar debe ser mayor a 0. Total: $${total}`);
+        void alertError(`El monto a pagar debe ser mayor a 0. Total: $${total}`);
         return;
       }
 
@@ -97,11 +97,11 @@ export const PagosCliente = () => {
         setLinkPago(result.data.bold_link);
         setMostrarModal(true);
       } else {
-        alertError(result.message || 'Error al crear el pago');
+        void alertError(result.message || 'Error al crear el pago');
       }
     } catch (error) {
       console.error('Error al pagar:', error);
-      alertError(error.message || 'Error al procesar el pago');
+      void alertError(error.message || 'Error al procesar el pago');
     } finally {
       setProcesando(false);
     }

@@ -176,7 +176,7 @@ export const checkFechaNacimiento = (fecha) => {
     return { valido: false, mensaje: MENSAJES.FECHA_REQUERIDA };
   }
   const date = new Date(fecha);
-  if (isNaN(date.getTime())) {
+  if (Number.isNaN(date.getTime())) {
     return { valido: false, mensaje: MENSAJES.FECHA_INVALIDA };
   }
   return { valido: true };

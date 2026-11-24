@@ -18,7 +18,7 @@ export const Iniciosesion = () => {
     try {
       if (!usuario) {
         console.log(' No hay usuario para redirigir');
-        navigate('/');
+        void navigate('/');
         return;
       }
 
@@ -43,29 +43,29 @@ export const Iniciosesion = () => {
       // ADMIN
       if (rolesArray.includes('ADMIN') || rolesArray.includes('ADMINISTRADOR')) {
         console.log(' Redirigiendo a Administrador');
-        navigate('/admin/dashboard');
+        void navigate('/admin/dashboard');
         return;
       }
 
       // REPARTIDOR
       if (rolesArray.includes('REPARTIDOR')) {
         console.log(' Redirigiendo a Repartidor');
-        navigate('/repartidor/inicio');
+        void navigate('/repartidor/inicio');
         return;
       }
 
       // CLIENTE
       if (rolesArray.includes('CLIENTE')) {
         console.log(' Redirigiendo a Cliente');
-        navigate('/cliente/inicio');
+        void navigate('/cliente/inicio');
         return;
       }
 
       console.log(' Rol no reconocido');
-      navigate('/');
+      void navigate('/');
     } catch (error) {
       console.error(' Error al redirigir:', error);
-      navigate('/');
+      void navigate('/');
     }
   };
 
@@ -130,11 +130,12 @@ export const Iniciosesion = () => {
         <form onSubmit={handleSubmit}>
 
           {/* EMAIL */}
-          <label className="block text-black text-sm font-medium mb-2">
+          <label htmlFor="email" className="block text-black text-sm font-medium mb-2">
             Email
           </label>
 
           <input
+            id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -144,12 +145,13 @@ export const Iniciosesion = () => {
           />
 
           {/* CONTRASEÑA */}
-          <label className="block text-black text-sm font-medium mt-5 mb-2">
+          <label htmlFor="password" className="block text-black text-sm font-medium mt-5 mb-2">
             Contraseña
           </label>
 
           <div className="relative w-full">
             <input
+              id="password"
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}

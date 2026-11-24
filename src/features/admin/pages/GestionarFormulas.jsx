@@ -36,12 +36,12 @@ const GestionarFormulas = () => {
 
   useEffect(() => {
     setLoading(true);
-    cargarFormulas();
+    void cargarFormulas();
   }, [cargarFormulas]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    cargarFormulas();
+    void cargarFormulas();
   };
 
   const formulasFiltradas = useMemo(() => {
@@ -74,7 +74,7 @@ const GestionarFormulas = () => {
   const rechazadas = formulas.filter((f) => f.estado === 'Rechazado').length;
 
   const abrirFormula = (formula) => {
-    navigate(`/admin/formulas/${formula.id_formula}`);
+    void navigate(`/admin/formulas/${formula.id_formula}`);
   };
 
   const getEstadoColor = (estado) => {
@@ -104,7 +104,7 @@ const GestionarFormulas = () => {
   const rechazarFormula = async (item) => {
     const checkIdResult = checkId(item.id_formula);
     if (!checkIdResult.valido) {
-      alertError(checkIdResult.mensaje || 'ID inválido');
+      void alertError(checkIdResult.mensaje || 'ID inválido');
       return;
     }
 
@@ -112,13 +112,13 @@ const GestionarFormulas = () => {
       const resultado = await formulaController.actualizarEstadoFormula(item.id_formula, 'Rechazado');
 
       if (resultado.success) {
-        cargarFormulas();
+        void cargarFormulas();
       } else {
-        alertError(resultado.message || 'No se pudo rechazar la fórmula');
+        void alertError(resultado.message || 'No se pudo rechazar la fórmula');
       }
     } catch (error) {
       console.error('Error al rechazar fórmula:', error);
-      alertError('Ocurrió un error al rechazar la fórmula');
+      void alertError('Ocurrió un error al rechazar la fórmula');
     }
   };
 
@@ -126,7 +126,7 @@ const GestionarFormulas = () => {
     const estado = item.estado || 'Pendiente';
 
     if (estado === 'Rechazado' || estado === 'Aprobado') {
-      alertWarning('Esta fórmula ya ha sido procesada');
+      void alertWarning('Esta fórmula ya ha sido procesada');
       return;
     }
 
@@ -137,7 +137,7 @@ const GestionarFormulas = () => {
     });
 
     if (confirmado) {
-      rechazarFormula(item);
+      void rechazarFormula(item);
     }
   };
 
@@ -157,7 +157,7 @@ const GestionarFormulas = () => {
         <p className="mt-3 text-xl font-bold text-gray-700">Ocurrió un error</p>
         <p className="mt-2 text-center text-gray-500 text-[13px]">{error}</p>
         <button
-          onClick={() => { setLoading(true); cargarFormulas(); }}
+          onClick={() => { setLoading(true); void cargarFormulas(); }}
           className="mt-5 bg-[#B90F0F] flex items-center gap-2 px-[18px] py-2.5 rounded-lg text-white font-semibold"
         >
           <i className="fa-solid fa-rotate-right"></i>
@@ -284,7 +284,7 @@ const GestionarFormulas = () => {
         <div className="flex flex-col lg:flex-row gap-4">
 
           <div className="flex-1">
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="buscar-formula" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Buscar fórmula
             </label>
 
@@ -292,6 +292,7 @@ const GestionarFormulas = () => {
               <i className="fa-solid fa-magnifying-glass text-gray-400 mr-2.5"></i>
 
               <input
+                id="buscar-formula"
                 type="text"
                 placeholder="Buscar por fórmula, cliente, condición, email..."
                 value={busqueda}
@@ -312,7 +313,7 @@ const GestionarFormulas = () => {
           </div>
 
           <div className="lg:w-72">
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="filtro-estado" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Filtrar por estado
             </label>
 
@@ -320,6 +321,7 @@ const GestionarFormulas = () => {
               <i className="fa-solid fa-filter text-gray-400 mr-2.5"></i>
 
               <select
+                id="filtro-estado"
                 value={filtroEstado}
                 onChange={(e) => setFiltroEstado(e.target.value)}
                 className="flex-1 bg-transparent outline-none text-sm text-gray-700 py-2.5 cursor-pointer"
@@ -401,7 +403,15 @@ const GestionarFormulas = () => {
             return (
               <div
                 key={item.id_formula}
+                role="button"
+                tabIndex={0}
                 onClick={() => abrirFormula(item)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    abrirFormula(item);
+                  }
+                }}
                 className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden cursor-pointer hover:shadow-md hover:border-gray-300 transition"
               >
 
@@ -442,7 +452,7 @@ const GestionarFormulas = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        mostrarMenuOpciones(item);
+                        void mostrarMenuOpciones(item);
                       }}
                       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition ${
                         estado === 'Pendiente'

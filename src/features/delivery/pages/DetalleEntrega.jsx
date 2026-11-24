@@ -21,14 +21,14 @@ const DetalleEntrega = () => {
       setLoading(true);
 
       if (!id_distribucion) {
-        alertError('No se recibió el ID de la distribución.');
+        void alertError('No se recibió el ID de la distribución.');
         return;
       }
 
       const resultado = await distribucionController.getDistribucionById(Number(id_distribucion));
 
       if (!resultado) {
-        alertError('No se encontró la distribución o no tienes acceso a ella.');
+        void alertError('No se encontró la distribución o no tienes acceso a ella.');
         setDistribucion(null);
         return;
       }
@@ -36,14 +36,14 @@ const DetalleEntrega = () => {
       setDistribucion(resultado);
     } catch (error) {
       console.error('Error al cargar detalle de entrega:', error);
-      alertError('No se pudo cargar la información de la entrega.');
+      void alertError('No se pudo cargar la información de la entrega.');
     } finally {
       setLoading(false);
     }
   }, [id_distribucion]);
 
   useEffect(() => {
-    cargarDistribucion();
+    void cargarDistribucion();
   }, [cargarDistribucion]);
 
   const iniciarEntrega = async () => {
@@ -51,7 +51,7 @@ const DetalleEntrega = () => {
       setActionLoading(true);
       const resultado = await distribucionController.iniciarEntrega(Number(id_distribucion));
       if (!resultado.success) {
-        alertError(resultado.message || 'Intenta nuevamente.');
+        void alertError(resultado.message || 'Intenta nuevamente.');
         return;
       }
       await cargarDistribucion();
@@ -63,7 +63,7 @@ const DetalleEntrega = () => {
   const marcarEntregado = async (textoObservacion) => {
     const check = checkObservacion(textoObservacion);
     if (!check.valido) {
-      alertWarning(check.mensaje || 'Observación inválida');
+      void alertWarning(check.mensaje || 'Observación inválida');
       return;
     }
 
@@ -74,7 +74,7 @@ const DetalleEntrega = () => {
         textoObservacion?.trim() || undefined
       );
       if (!resultado.success) {
-        alertError(resultado.message || 'Intenta nuevamente.');
+        void alertError(resultado.message || 'Intenta nuevamente.');
         return;
       }
       setObservacion('');

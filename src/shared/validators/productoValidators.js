@@ -65,13 +65,13 @@ export const validarColor = (color) => {
 export const validarPrecio = (precio) => {
   if (precio === undefined || precio === null || precio === '') return false;
   const num = Number(precio);
-  return !isNaN(num) && num > 0;
+  return !Number.isNaN(num) && num > 0;
 };
 
 export const validarId = (id) => {
   if (id === undefined || id === null || id === '') return false;
   const num = Number(id);
-  return !isNaN(num) && num > 0 && Number.isInteger(num);
+  return !Number.isNaN(num) && num > 0 && Number.isInteger(num);
 };
 
 // CHECKERS CON MENSAJE
@@ -132,7 +132,7 @@ export const checkPrecioProducto = (precio) => {
     return { valido: false, mensaje: MENSAJES_PRODUCTO.PRECIO_REQUERIDO };
   }
   const num = Number(precio);
-  if (isNaN(num)) {
+  if (Number.isNaN(num)) {
     return { valido: false, mensaje: MENSAJES_PRODUCTO.PRECIO_INVALIDO };
   }
   if (num < 0) {

@@ -25,7 +25,7 @@ export const MENSAJES_PAGO = {
 export const validarId = (id) => {
   if (id === undefined || id === null || id === '') return false;
   const num = Number(id);
-  return !isNaN(num) && num > 0 && Number.isInteger(num);
+  return !Number.isNaN(num) && num > 0 && Number.isInteger(num);
 };
 
 export const validarEleccionPago = (eleccion) => {
@@ -36,7 +36,7 @@ export const validarEleccionPago = (eleccion) => {
 export const validarMonto = (monto) => {
   if (monto === undefined || monto === null || monto === '') return false;
   const num = Number(monto);
-  return !isNaN(num) && num > 0;
+  return !Number.isNaN(num) && num > 0;
 };
 
 export const validarEstadoPago = (estado) => {
@@ -82,7 +82,7 @@ export const checkMonto = (monto) => {
     return { valido: false, mensaje: MENSAJES_PAGO.MONTO_REQUERIDO };
   }
   const num = Number(monto);
-  if (isNaN(num)) {
+  if (Number.isNaN(num)) {
     return { valido: false, mensaje: MENSAJES_PAGO.MONTO_INVALIDO };
   }
   if (num < 0) {

@@ -19,7 +19,7 @@ export const PrincipalCliente = () => {
   useEffect(() => {
     if (cargadoInicial.current) return;
     cargadoInicial.current = true;
-    cargarDatosCliente();
+    void cargarDatosCliente();
   }, []);
 
   const cargarDatosCliente = async () => {

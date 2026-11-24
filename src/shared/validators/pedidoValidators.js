@@ -72,7 +72,7 @@ export const validarProductos = (productos) => {
 export const validarId = (id) => {
   if (id === undefined || id === null || id === '') return false;
   const num = Number(id);
-  return !isNaN(num) && num > 0 && Number.isInteger(num);
+  return !Number.isNaN(num) && num > 0 && Number.isInteger(num);
 };
 
 export const validarFechaEstimada = (fecha) => {
@@ -83,7 +83,7 @@ export const validarFechaEstimada = (fecha) => {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  if (isNaN(fechaComparar.getTime())) return false;
+  if (Number.isNaN(fechaComparar.getTime())) return false;
   return fechaComparar >= hoy;
 };
 
@@ -151,7 +151,7 @@ export const checkFechaEstimada = (fecha) => {
     return { valido: false, mensaje: MENSAJES_PEDIDO.FECHA_FORMATO_INVALIDO };
   }
   const fechaComparar = new Date(`${fecha}T00:00:00`);
-  if (isNaN(fechaComparar.getTime())) {
+  if (Number.isNaN(fechaComparar.getTime())) {
     return { valido: false, mensaje: MENSAJES_PEDIDO.FECHA_INVALIDA };
   }
   const hoy = new Date();

@@ -48,7 +48,7 @@ const DistribucionesExternas = () => {
         setDistribuciones(externas);
       } catch (error) {
         console.error('Error al cargar distribuciones externas:', error);
-        alertError(error?.message || 'No se pudieron cargar las distribuciones externas.');
+        void alertError(error?.message || 'No se pudieron cargar las distribuciones externas.');
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -58,7 +58,7 @@ const DistribucionesExternas = () => {
   );
 
   useEffect(() => {
-    cargarDistribuciones();
+    void cargarDistribuciones();
   }, [cargarDistribuciones]);
 
   const distribucionesActivas = useMemo(
@@ -197,7 +197,7 @@ const DistribucionesExternas = () => {
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 mb-6">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="buscar-distribucion" className="block text-sm font-semibold text-gray-700 mb-2">
               Buscar distribución
             </label>
 
@@ -205,6 +205,7 @@ const DistribucionesExternas = () => {
               <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
               <input
+                id="buscar-distribucion"
                 type="text"
                 placeholder="Cliente, ciudad o dirección..."
                 value={buscar}
@@ -216,6 +217,7 @@ const DistribucionesExternas = () => {
                 <button
                   onClick={() => setBuscar('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label="Limpiar busqueda"
                 >
                   <i className="fa-solid fa-circle-xmark"></i>
                 </button>
@@ -224,11 +226,12 @@ const DistribucionesExternas = () => {
           </div>
 
           <div className="w-full lg:w-56">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="ciudad-select" className="block text-sm font-semibold text-gray-700 mb-2">
               Ciudad
             </label>
 
             <select
+              id="ciudad-select"
               value={ciudadFiltro}
               onChange={(e) => setCiudadFiltro(e.target.value)}
               className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-[#B90F0F] text-sm"

@@ -1,5 +1,3 @@
-// src/shared/types/MensajeContacto.js
-
 export const validarMensajeContacto = (data) => {
   const errors = [];
 
@@ -7,7 +5,8 @@ export const validarMensajeContacto = (data) => {
     errors.push('El nombre debe tener al menos 2 caracteres');
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
   if (!data.email || !emailRegex.test(data.email)) {
     errors.push('El email no es válido');
   }

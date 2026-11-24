@@ -81,7 +81,7 @@ export const ReportesAdmin = () => {
       if (result && result.success && result.blob) {
         const nombrePDF = `Reporte_${tipo}_${new Date().toISOString().slice(0, 10)}.pdf`;
         descargarPDF(result.blob, nombrePDF);
-        alertSuccess('Reporte generado correctamente. Se descargará automáticamente.');
+        void alertSuccess('Reporte generado correctamente. Se descargará automáticamente.');
       } else {
         setError(result?.message || 'Error al generar el reporte');
       }
@@ -150,7 +150,7 @@ export const ReportesAdmin = () => {
           <div className="mt-6 space-y-5">
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="tipo-reporte" className="block text-sm font-semibold text-gray-700 mb-2">
                 Tipo de Reporte
               </label>
 
@@ -158,6 +158,7 @@ export const ReportesAdmin = () => {
                 <i className="fa-solid fa-chart-column absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
                 <select
+                  id="tipo-reporte"
                   value={tipo}
                   onChange={(e) => setTipo(e.target.value)}
                   disabled={loading}
@@ -173,9 +174,9 @@ export const ReportesAdmin = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <p className="block text-sm font-semibold text-gray-700 mb-2">
                 Periodo
-              </label>
+              </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {periodosList.map((item) => {
@@ -219,11 +220,12 @@ export const ReportesAdmin = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="fecha-inicio" className="block text-sm font-semibold text-gray-700 mb-2">
                       Fecha Inicio
                     </label>
 
                     <input
+                      id="fecha-inicio"
                       type="date"
                       value={formatearFecha(fechaInicio)}
                       onChange={(e) => setFechaInicio(new Date(e.target.value))}
@@ -233,11 +235,12 @@ export const ReportesAdmin = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="fecha-fin" className="block text-sm font-semibold text-gray-700 mb-2">
                       Fecha Fin
                     </label>
 
                     <input
+                      id="fecha-fin"
                       type="date"
                       value={formatearFecha(fechaFin)}
                       onChange={(e) => setFechaFin(new Date(e.target.value))}

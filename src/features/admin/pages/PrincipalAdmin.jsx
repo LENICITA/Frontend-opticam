@@ -17,7 +17,7 @@ export const PrincipalAdmin = () => {
   const userController = new UserController();
 
   useEffect(() => {
-    cargarDatos();
+    void cargarDatos();
   }, []);
 
   const cargarDatos = async () => {

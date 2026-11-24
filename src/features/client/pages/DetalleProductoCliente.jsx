@@ -14,7 +14,7 @@ const DetalleProductoCliente = () => {
   const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
-    if (id) cargarDetalleProducto();
+    if (id) void cargarDetalleProducto();
     else setLoading(false);
   }, [id]);
 
@@ -56,10 +56,10 @@ const DetalleProductoCliente = () => {
       }
 
       localStorage.setItem('@carrito', JSON.stringify(carrito));
-      toastSuccess(`${producto.nombre} agregado al carrito`);
+      void toastSuccess(`${producto.nombre} agregado al carrito`);
     } catch (error) {
       console.error('Error al agregar al carrito:', error);
-      alertError('No se pudo agregar el producto al carrito');
+      void alertError('No se pudo agregar el producto al carrito');
     }
   };
 

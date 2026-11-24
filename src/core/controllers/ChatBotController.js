@@ -2,6 +2,14 @@
 import { ChatBotService } from '../services/ChatBotService';
 import { checkMensajeChatbot } from '../../shared/validators/chatbotValidators';
 
+// Helper: genera un ID único y criptográficamente seguro
+// Funciona en cualquier contexto (HTTP, HTTPS, red local)
+function generarIdSeguro() {
+  const array = new Uint32Array(4);
+  crypto.getRandomValues(array);
+  return Array.from(array, (n) => n.toString(16).padStart(8, '0')).join('-');
+}
+
 export class ChatBotController {
   constructor() {
     this.chatBotService = new ChatBotService();
@@ -35,7 +43,7 @@ export class ChatBotController {
       };
 
     } catch (error) {
-      console.error(' Error en enviarMensaje:', error);
+      console.error('Error en enviarMensaje:', error);
       const mensajeBackend = error.response?.data?.message;
       return {
         success: false,
@@ -50,7 +58,7 @@ export class ChatBotController {
       const botones = await this.chatBotService.obtenerBotones();
       return botones;
     } catch (error) {
-      console.error(' Error en obtenerBotones:', error);
+      console.error('Error en obtenerBotones:', error);
       return [];
     }
   }
@@ -63,7 +71,7 @@ export class ChatBotController {
   // ===== CREAR MENSAJE PARA UI =====
   crearMensaje(texto, tipo) {
     return {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `${Date.now()}-${generarIdSeguro()}`,
       texto,
       tipo,
       timestamp: new Date(),

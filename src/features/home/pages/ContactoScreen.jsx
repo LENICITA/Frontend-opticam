@@ -50,7 +50,7 @@ export const ContactoScreen = () => {
       if (result.success) {
         setEnviado(true);
         setFormData({ nombre: '', email: '', telefono: '', mensaje: '' });
-        alertSuccess('¡Mensaje enviado! Te contactaremos pronto.');
+        void alertSuccess('¡Mensaje enviado! Te contactaremos pronto.');
         setTimeout(() => setEnviado(false), 5000);
       } else {
         setError(result.message || 'Error al enviar el mensaje');
@@ -225,7 +225,7 @@ export const ContactoScreen = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">
+                <label htmlFor="nombre-completo" className="block text-sm font-bold text-gray-800 mb-2">
                   Nombre completo *
                 </label>
 
@@ -233,6 +233,7 @@ export const ContactoScreen = () => {
                   <i className="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
                   <input
+                    id="nombre-completo"
                     type="text"
                     value={formData.nombre}
                     onChange={(e) => handleChange('nombre', e.target.value)}
@@ -244,7 +245,7 @@ export const ContactoScreen = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">
+                <label htmlFor="email" className="block text-sm font-bold text-gray-800 mb-2">
                   Correo electrónico *
                 </label>
 
@@ -252,6 +253,7 @@ export const ContactoScreen = () => {
                   <i className="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
                   <input
+                    id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
@@ -264,7 +266,7 @@ export const ContactoScreen = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-800 mb-2">
+                <label htmlFor="telefono" className="block text-sm font-bold text-gray-800 mb-2">
                   Teléfono
                 </label>
 
@@ -272,6 +274,7 @@ export const ContactoScreen = () => {
                   <i className="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
                   <input
+                    id="telefono"
                     type="tel"
                     value={formData.telefono}
                     onChange={(e) => handleChange('telefono', e.target.value)}
@@ -284,7 +287,7 @@ export const ContactoScreen = () => {
 
               <div className="md:col-span-2">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-bold text-gray-800">
+                  <label htmlFor="mensaje" className="block text-sm font-bold text-gray-800">
                     Mensaje *
                   </label>
 
@@ -294,6 +297,7 @@ export const ContactoScreen = () => {
                 </div>
 
                 <textarea
+                  id="mensaje"
                   value={formData.mensaje}
                   onChange={(e) => handleChange('mensaje', e.target.value)}
                   placeholder="Escribe aquí tu PQRS..."

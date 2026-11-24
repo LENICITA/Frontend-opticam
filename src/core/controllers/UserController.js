@@ -8,8 +8,42 @@ import {
   checkTelefono,
   checkCiudad,
   checkEmail,
-  checkNombre
+  checkNombre,
 } from '../../shared/validators/userValidators';
+
+// ✅ 1. Funciones auxiliares para evitar duplicaciones
+const mapearVehiculo = (vehiculo) => {
+  if (!vehiculo) return undefined;
+  return {
+    tipo: vehiculo.tipo,
+    modelo: vehiculo.modelo,
+    placa: vehiculo.placa,
+    color: vehiculo.color,
+  };
+};
+
+const mapearUserData = (data) => {
+  return UserModel.fromJSON({
+    id_usuario: data.id_usuario || data.id || 0,
+    nombre_completo: data.nombre_completo || data.nombre || '',
+    email: data.email || '',
+    telefono: data.telefono || '',
+    direccion: data.direccion || '',
+    ciudad: data.ciudad || '',
+    documento: data.documento || 0,
+    fecha_nacimiento: data.fecha_nacimiento || '',
+    fecha_registro: data.fecha_registro || '',
+    estado: data.estado || 'ACTIVO',
+    roles: data.roles || [],
+    vehiculo: mapearVehiculo(data.vehiculo),
+  });
+};
+
+const obtenerMensajeError = (error, mensajePorDefecto) => {
+  if (error.response?.status === 400) return error.response?.data?.message || 'Datos inválidos';
+  if (error.response?.status === 409) return error.response?.data?.message || 'El email o documento ya está registrado';
+  return error.response?.data?.message || mensajePorDefecto;
+};
 
 export class UserController {
   constructor() {
@@ -25,56 +59,35 @@ export class UserController {
     try {
       const response = await this.userService.getProfile();
       if (!response.success) return null;
-
-      const userData = response.data;
-
-      const userModel = UserModel.fromJSON({
-        id_usuario: userData.id_usuario,
-        nombre_completo: userData.nombre_completo,
-        email: userData.email,
-        telefono: userData.telefono || '',
-        direccion: userData.direccion || '',
-        ciudad: userData.ciudad || '',
-        documento: userData.documento || 0,
-        fecha_nacimiento: userData.fecha_nacimiento || '',
-        fecha_registro: '',
-        estado: userData.estado || 'ACTIVO',
-        roles: userData.roles || [],
-        vehiculo: userData.vehiculo,
-      });
-
-      return userModel;
+      return mapearUserData(response.data);
     } catch (error) {
-      console.error(' Error en getProfile:', error);
+      console.error('Error en getProfile:', error);
       return null;
     }
   }
 
   async updateProfile(data, userRoles) {
     try {
-      if (userRoles && userRoles.some(r => r.toUpperCase() === 'REPARTIDOR')) {
+      if (userRoles && userRoles.some((r) => r.toUpperCase() === 'REPARTIDOR')) {
         return {
           success: false,
-          message: 'Los repartidores no pueden editar su perfil. Contacta al administrador.'
+          message: 'Los repartidores no pueden editar su perfil. Contacta al administrador.',
         };
       }
 
       // Validaciones por campo (solo si vienen)
-      if (data.nombre_completo) {
-        const check = checkNombre(data.nombre_completo);
-        if (!check.valido) return { success: false, message: check.mensaje };
-      }
-      if (data.email) {
-        const check = checkEmail(data.email);
-        if (!check.valido) return { success: false, message: check.mensaje };
-      }
-      if (data.telefono) {
-        const check = checkTelefono(data.telefono);
-        if (!check.valido) return { success: false, message: check.mensaje };
-      }
-      if (data.ciudad) {
-        const check = checkCiudad(data.ciudad);
-        if (!check.valido) return { success: false, message: check.mensaje };
+      const validaciones = [
+        { campo: data.nombre_completo, check: checkNombre },
+        { campo: data.email, check: checkEmail },
+        { campo: data.telefono, check: checkTelefono },
+        { campo: data.ciudad, check: checkCiudad },
+      ];
+
+      for (const { campo, check } of validaciones) {
+        if (campo) {
+          const result = check(campo);
+          if (!result.valido) return { success: false, message: result.mensaje };
+        }
       }
 
       const response = await this.userService.updateProfile(data);
@@ -88,16 +101,8 @@ export class UserController {
         data: response.data,
       };
     } catch (error) {
-      console.error(' Error en updateProfile:', error);
-      let message = 'Error al actualizar perfil';
-      if (error.response?.status === 400) {
-        message = error.response?.data?.message || 'Datos inválidos';
-      } else if (error.response?.status === 409) {
-        message = error.response?.data?.message || 'El email o documento ya está registrado';
-      } else if (error.response?.data?.message) {
-        message = error.response.data.message;
-      }
-      return { success: false, message };
+      console.error('Error en updateProfile:', error);
+      return { success: false, message: obtenerMensajeError(error, 'Error al actualizar perfil') };
     }
   }
 
@@ -132,16 +137,8 @@ export class UserController {
         data: response.data,
       };
     } catch (error) {
-      console.error(' Error en registrarCliente:', error);
-      let message = 'Error al registrar cliente';
-      if (error.response?.status === 400) {
-        message = error.response?.data?.message || 'Datos inválidos';
-      } else if (error.response?.status === 409) {
-        message = error.response?.data?.message || 'El email o documento ya está registrado';
-      } else if (error.response?.data?.message) {
-        message = error.response.data.message;
-      }
-      return { success: false, message };
+      console.error('Error en registrarCliente:', error);
+      return { success: false, message: obtenerMensajeError(error, 'Error al registrar cliente') };
     }
   }
 
@@ -150,7 +147,7 @@ export class UserController {
       const response = await this.userService.countClientes();
       return response;
     } catch (error) {
-      console.error(' Error en countClientes:', error);
+      console.error('Error en countClientes:', error);
       return { success: false, data: { total: 0 } };
     }
   }
@@ -163,30 +160,9 @@ export class UserController {
     try {
       const response = await this.userService.getRepartidores();
       if (!response.success) return [];
-
-      return response.data.map((r) =>
-        UserModel.fromJSON({
-          id_usuario: r.id_usuario || r.id || 0,
-          nombre_completo: r.nombre_completo || r.nombre || '',
-          telefono: r.telefono || '',
-          fecha_nacimiento: r.fecha_nacimiento || '',
-          documento: r.documento || 0,
-          ciudad: r.ciudad || '',
-          direccion: r.direccion || '',
-          fecha_registro: r.fecha_registro || new Date().toISOString(),
-          email: r.email || '',
-          estado: r.estado || 'INACTIVO',
-          roles: r.roles || [],
-          vehiculo: r.vehiculo ? {
-            tipo: r.vehiculo.tipo,
-            modelo: r.vehiculo.modelo,
-            placa: r.vehiculo.placa,
-            color: r.vehiculo.color,
-          } : undefined,
-        })
-      );
+      return response.data.map(mapearUserData);
     } catch (error) {
-      console.error(' Error en getRepartidores:', error);
+      console.error('Error en getRepartidores:', error);
       return [];
     }
   }
@@ -196,29 +172,9 @@ export class UserController {
       console.log('🔍 Fetching repartidor details for ID:', id);
       const response = await this.userService.getRepartidorById(id);
       if (!response.success) return null;
-
-      const r = response.data;
-      return UserModel.fromJSON({
-        id_usuario: r.id_usuario || r.id || 0,
-        nombre_completo: r.nombre_completo || r.nombre || '',
-        telefono: r.telefono || '',
-        fecha_nacimiento: r.fecha_nacimiento || '',
-        documento: r.documento || 0,
-        ciudad: r.ciudad || '',
-        direccion: r.direccion || '',
-        fecha_registro: r.fecha_registro || '',
-        email: r.email || '',
-        estado: r.estado || 'INACTIVO',
-        roles: r.roles || [],
-        vehiculo: r.vehiculo ? {
-          tipo: r.vehiculo.tipo,
-          modelo: r.vehiculo.modelo,
-          placa: r.vehiculo.placa,
-          color: r.vehiculo.color,
-        } : undefined,
-      });
+      return mapearUserData(response.data);
     } catch (error) {
-      console.error(' Error en getRepartidorById:', error);
+      console.error('Error en getRepartidorById:', error);
       return null;
     }
   }
@@ -234,12 +190,7 @@ export class UserController {
         direccion: data.direccion,
         email: data.email,
         contrasena: data.contrasena || '',
-        vehiculo: data.vehiculo ? {
-          tipo: data.vehiculo.tipo,
-          modelo: data.vehiculo.modelo,
-          placa: data.vehiculo.placa,
-          color: data.vehiculo.color,
-        } : undefined,
+        vehiculo: mapearVehiculo(data.vehiculo),
       });
 
       if (!check.valido) {
@@ -256,32 +207,24 @@ export class UserController {
         data: response.data,
       };
     } catch (error) {
-      console.error(' Error en registrarRepartidor:', error);
-      let message = 'Error al registrar repartidor';
-      if (error.response?.status === 400) {
-        message = error.response?.data?.message || 'Datos inválidos';
-      } else if (error.response?.status === 409) {
-        message = error.response?.data?.message || 'El email, documento o placa ya está registrado';
-      } else if (error.response?.data?.message) {
-        message = error.response.data.message;
-      }
-      return { success: false, message };
+      console.error('Error en registrarRepartidor:', error);
+      return { success: false, message: obtenerMensajeError(error, 'Error al registrar repartidor') };
     }
   }
 
   async actualizarRepartidor(id, data) {
     try {
-      if (data.telefono) {
-        const check = checkTelefono(data.telefono);
-        if (!check.valido) return { success: false, message: check.mensaje };
-      }
-      if (data.ciudad) {
-        const check = checkCiudad(data.ciudad);
-        if (!check.valido) return { success: false, message: check.mensaje };
-      }
-      if (data.email) {
-        const check = checkEmail(data.email);
-        if (!check.valido) return { success: false, message: check.mensaje };
+      const validaciones = [
+        { campo: data.telefono, check: checkTelefono },
+        { campo: data.ciudad, check: checkCiudad },
+        { campo: data.email, check: checkEmail },
+      ];
+
+      for (const { campo, check } of validaciones) {
+        if (campo) {
+          const result = check(campo);
+          if (!result.valido) return { success: false, message: result.mensaje };
+        }
       }
 
       const response = await this.userService.actualizarRepartidor(id, data);
@@ -294,11 +237,8 @@ export class UserController {
         data: response.data,
       };
     } catch (error) {
-      console.error(' Error en actualizarRepartidor:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Error al actualizar repartidor',
-      };
+      console.error('Error en actualizarRepartidor:', error);
+      return { success: false, message: obtenerMensajeError(error, 'Error al actualizar repartidor') };
     }
   }
 
@@ -316,11 +256,8 @@ export class UserController {
         message: response.message || 'Estado actualizado correctamente',
       };
     } catch (error) {
-      console.error(' Error en cambiarEstadoRepartidor:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Error al cambiar estado',
-      };
+      console.error('Error en cambiarEstadoRepartidor:', error);
+      return { success: false, message: obtenerMensajeError(error, 'Error al cambiar estado') };
     }
   }
 
@@ -335,11 +272,8 @@ export class UserController {
         message: response.message || 'Repartidor eliminado correctamente',
       };
     } catch (error) {
-      console.error(' Error en eliminarRepartidor:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Error al eliminar repartidor',
-      };
+      console.error('Error en eliminarRepartidor:', error);
+      return { success: false, message: obtenerMensajeError(error, 'Error al eliminar repartidor') };
     }
   }
 
@@ -357,15 +291,10 @@ export class UserController {
         ciudad: r.ciudad,
         pedidos: r.pedidos_count || 0,
         fecha_registro: r.fecha_registro || new Date().toISOString(),
-        vehiculo: r.vehiculo ? {
-          tipo: r.vehiculo.tipo,
-          modelo: r.vehiculo.modelo,
-          placa: r.vehiculo.placa,
-          color: r.vehiculo.color,
-        } : undefined,
+        vehiculo: mapearVehiculo(r.vehiculo),
       }));
     } catch (error) {
-      console.error(' Error en buscarRepartidores:', error);
+      console.error('Error en buscarRepartidores:', error);
       return [];
     }
   }
@@ -384,26 +313,13 @@ export class UserController {
 
       const response = await this.userService.getProfile();
       if (response.success) {
-        const userData = response.data;
-        const userModel = UserModel.fromJSON({
-          id_usuario: userData.id_usuario,
-          nombre_completo: userData.nombre_completo,
-          email: userData.email,
-          telefono: userData.telefono || '',
-          direccion: userData.direccion || '',
-          ciudad: userData.ciudad || '',
-          documento: userData.documento || 0,
-          fecha_nacimiento: userData.fecha_nacimiento || '',
-          fecha_registro: '',
-          estado: userData.estado || 'ACTIVO',
-          roles: userData.roles || [],
-        });
+        const userModel = mapearUserData(response.data);
         await this.userRepository.saveUser(userModel);
         return userModel;
       }
       return null;
     } catch (error) {
-      console.error(' Error en loadUser:', error);
+      console.error('Error en loadUser:', error);
       await this.userRepository.clearSession();
       return null;
     }

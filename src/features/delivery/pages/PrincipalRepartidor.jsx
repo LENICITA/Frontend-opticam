@@ -40,7 +40,7 @@ export const PrincipalRepartidor = () => {
           if (fechaEstimada) {
             try {
               const fecha = new Date(fechaEstimada);
-              if (!isNaN(fecha.getTime())) {
+              if (!Number.isNaN(fecha.getTime())) {
                 fechaMostrar = fecha.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
               } else {
                 fechaMostrar = fechaEstimada;
@@ -52,8 +52,8 @@ export const PrincipalRepartidor = () => {
 
           const latitudRaw = d.latitud ?? d.latitude;
           const longitudRaw = d.longitud ?? d.longitude;
-          const latitud = latitudRaw ? Number(latitudRaw) : NaN;
-          const longitud = longitudRaw ? Number(longitudRaw) : NaN;
+          const latitud = latitudRaw ? Number(latitudRaw) : Number.NaN;
+          const longitud = longitudRaw ? Number(longitudRaw) : Number.NaN;
 
           let estado = 'PENDIENTE';
           if (d.estado === 'EN_ENTREGA') estado = 'EN_ENTREGA';
@@ -85,22 +85,22 @@ export const PrincipalRepartidor = () => {
     } catch (error) {
       console.error('Error al cargar datos del repartidor:', error);
       setPedidos([]);
-      alertError('No se pudieron cargar las entregas asignadas.');
+      void alertError('No se pudieron cargar las entregas asignadas.');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    cargarPedidos();
+    void cargarPedidos();
   }, [cargarPedidos]);
 
   const verDetalleDistribucion = (pedido) => {
     if (!pedido.id_distribucion) {
-      alertError('No se encontró el ID de la distribución.');
+      void alertError('No se encontró el ID de la distribución.');
       return;
     }
-    navigate(`/repartidor/entrega/${pedido.id_distribucion}`);
+    void navigate(`/repartidor/entrega/${pedido.id_distribucion}`);
   };
 
   const abrirRutaEnMaps = (pedido) => {

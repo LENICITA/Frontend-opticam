@@ -17,7 +17,7 @@ const DetalleFormula = () => {
   const [imagenModalVisible, setImagenModalVisible] = useState(false);
 
   useEffect(() => {
-    cargarFormula();
+    void cargarFormula();
   }, [id_formula]);
 
   const cargarFormula = async () => {
@@ -53,7 +53,7 @@ const DetalleFormula = () => {
       });
 
       if (!check.valido) {
-        alertError(check.mensaje || 'Datos inválidos');
+        void alertError(check.mensaje || 'Datos inválidos');
         return;
       }
 
@@ -70,18 +70,18 @@ const DetalleFormula = () => {
             await cargarFormula();
             setEditandoCosto(false);
           } else {
-            alertError(resultadoEstado.message || 'No se pudo aprobar la fórmula');
+            void alertError(resultadoEstado.message || 'No se pudo aprobar la fórmula');
           }
         } else {
           await cargarFormula();
           setEditandoCosto(false);
         }
       } else {
-        alertError(resultadoCosto.message || 'No se pudo actualizar el costo');
+        void alertError(resultadoCosto.message || 'No se pudo actualizar el costo');
       }
     } catch (error) {
       console.error('Error al cargar valor de formula', error);
-      alertError('Ocurrió un error inesperado');
+      void alertError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
     }
@@ -299,8 +299,10 @@ const DetalleFormula = () => {
     {/* MODAL IMAGEN */}
     {imagenModalVisible && (
       <div
+        role="presentation"
         className="fixed inset-0 bg-black/90 z-[1000] flex items-center justify-center p-4"
         onClick={cerrarImagen}
+        onKeyDown={(e) => e.key === 'Escape' && cerrarImagen()}
       >
         <button
           onClick={cerrarImagen}

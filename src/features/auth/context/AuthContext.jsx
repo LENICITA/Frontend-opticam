@@ -169,7 +169,7 @@ export const AuthProvider = ({ children }) => {
 
   // ===== EFECTO INICIAL =====
   useEffect(() => {
-    loadUser();
+    void loadUser();
   }, [loadUser]);
 
   // ============================================

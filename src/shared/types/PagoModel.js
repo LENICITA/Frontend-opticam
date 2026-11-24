@@ -1,4 +1,4 @@
-// src/shared/types/PagoModel.js
+import { formatearFecha, formatearMoneda, formatearEstado } from '../utils/formatters';
 
 export class PagoModel {
   constructor(data) {
@@ -15,18 +15,11 @@ export class PagoModel {
   }
 
   get montoFormateado() {
-    return `$${this.monto.toLocaleString('es-CO')}`;
+    return formatearMoneda(this.monto);
   }
 
   get fechaFormateada() {
-    const date = new Date(this.fecha_pago);
-    return date.toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatearFecha(this.fecha_pago, true);
   }
 
   get estadoDisplay() {
@@ -35,7 +28,7 @@ export class PagoModel {
       'Confirmado': 'Confirmado',
       'Rechazado': 'Rechazado',
     };
-    return map[this.estado] || this.estado;
+    return formatearEstado(this.estado, map);
   }
 
   get estadoColor() {
@@ -44,7 +37,7 @@ export class PagoModel {
       'Confirmado': '#059669',
       'Rechazado': '#EF4444',
     };
-    return map[this.estado] || '#6B7280';
+    return formatearEstado(this.estado, map, '#6B7280');
   }
 
   get eleccionDisplay() {

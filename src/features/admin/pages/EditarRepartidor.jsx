@@ -43,7 +43,7 @@ const EditarRepartidor = () => {
   useEffect(() => {
     const cargarRepartidor = async () => {
       if (!id) {
-        alertError('No se encontró el ID del repartidor.');
+        void alertError('No se encontró el ID del repartidor.');
         return;
       }
 
@@ -52,7 +52,7 @@ const EditarRepartidor = () => {
         const response = await userController.getRepartidorById(Number(id));
 
         if (!response) {
-          alertError('No se encontró el repartidor.');
+          void alertError('No se encontró el repartidor.');
           return;
         }
 
@@ -78,13 +78,13 @@ const EditarRepartidor = () => {
         setFormModificado(false);
       } catch (error) {
         console.error('Error al cargar repartidor:', error);
-        alertError('No se pudieron cargar los datos del repartidor.');
+        void alertError('No se pudieron cargar los datos del repartidor.');
       } finally {
         setLoading(false);
       }
     };
 
-    cargarRepartidor();
+    void cargarRepartidor();
   }, [id]);
 
   const handleInputChange = (seccion, campo, valor) => {
@@ -130,7 +130,7 @@ const EditarRepartidor = () => {
 
   const actualizarRepartidor = async () => {
     if (!id) {
-      alertError('No se encontró el ID del repartidor.');
+      void alertError('No se encontró el ID del repartidor.');
       return;
     }
 
@@ -157,15 +157,15 @@ const EditarRepartidor = () => {
       const response = await userController.actualizarRepartidor(Number(id), datos);
 
       if (!response || !response.success) {
-        alertError(response?.message || 'No se pudo actualizar el repartidor.');
+        void alertError(response?.message || 'No se pudo actualizar el repartidor.');
         return;
       }
 
       setFormModificado(false);
-      navigate('/admin/repartidores');
+      void navigate('/admin/repartidores');
     } catch (error) {
       console.error('ERROR ACTUALIZANDO REPARTIDOR:', error);
-      alertError(error?.message || 'No se pudo actualizar el repartidor.');
+      void alertError(error?.message || 'No se pudo actualizar el repartidor.');
     } finally {
       setLoading(false);
     }
@@ -175,7 +175,7 @@ const EditarRepartidor = () => {
     e.preventDefault();
 
     if (!validarFormulario()) {
-      alertWarning('Por favor, completa todos los campos obligatorios');
+      void alertWarning('Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -186,7 +186,7 @@ const EditarRepartidor = () => {
     });
     if (!confirmado) return;
 
-    actualizarRepartidor();
+    void actualizarRepartidor();
   };
 
   const handleCancel = async () => {
@@ -197,9 +197,9 @@ const EditarRepartidor = () => {
         confirmButtonText: 'Sí, descartar',
         cancelButtonText: 'Seguir editando',
       });
-      if (confirmado) navigate(-1);
+      if (confirmado) void navigate(-1);
     } else {
-      navigate(-1);
+      void navigate(-1);
     }
   };
 
@@ -389,7 +389,7 @@ const EditarRepartidor = () => {
             />
 
             <div className="mb-3.5">
-              <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+              <label htmlFor="estado-select" className="text-sm font-semibold text-gray-700 mb-1.5 block">
                 Estado
               </label>
 
@@ -397,6 +397,7 @@ const EditarRepartidor = () => {
                 <i className="fa-solid fa-circle-dot text-[#B90F0F] mr-2.5"></i>
 
                 <select
+                  id="estado-select"
                   value={formData.datosPersonales.estado}
                   onChange={(e) =>
                     handleInputChange(
@@ -441,7 +442,7 @@ const EditarRepartidor = () => {
 
             <div className="mb-3.5">
               <div className="flex items-center gap-1 mb-1.5">
-                <label className="text-sm font-semibold text-gray-700">
+                <label htmlFor="tipodevehiculo-select" className="text-sm font-semibold text-gray-700">
                   Tipo de vehículo
                 </label>
 
@@ -460,6 +461,7 @@ const EditarRepartidor = () => {
                 <i className="fa-solid fa-car text-gray-400 mr-2.5"></i>
 
                 <select
+                  id="tipodevehiculo-select"
                   value={formData.datosVehiculo.tipo}
                   onChange={(e) =>
                     handleInputChange(

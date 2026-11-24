@@ -12,7 +12,7 @@ export const DetalleFormulaCliente = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    cargarFormula();
+    void cargarFormula();
   }, [id_formula]);
 
   const cargarFormula = async () => {

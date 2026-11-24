@@ -30,7 +30,7 @@ const HistorialEntregas = () => {
   }, []);
 
   useEffect(() => {
-    cargarHistorial();
+    void cargarHistorial();
   }, [cargarHistorial]);
 
   if (loading) {

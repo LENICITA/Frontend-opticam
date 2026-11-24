@@ -17,7 +17,7 @@ export const MisFormulasScreen = () => {
   const [selectedFormula, setSelectedFormula] = useState(null);
 
   useEffect(() => {
-    cargarFormulas();
+    void cargarFormulas();
   }, []);
 
   const cargarFormulas = async () => {
@@ -32,7 +32,7 @@ export const MisFormulasScreen = () => {
       setFormulas(resultado);
     } catch (error) {
       console.error('Error cargando fórmulas:', error);
-      alertError('No fue posible cargar tus fórmulas.');
+      void alertError('No fue posible cargar tus fórmulas.');
     } finally {
       setLoading(false);
     }
@@ -98,18 +98,18 @@ export const MisFormulasScreen = () => {
       const response = await formulaController.eliminarFormula(formula.id_formula);
 
       if (!response.success) {
-        alertError(response.message || 'No se pudo eliminar la fórmula.');
+        void alertError(response.message || 'No se pudo eliminar la fórmula.');
         return;
       }
 
       setFormulas((prev) => prev.filter((f) => f.id_formula !== formula.id_formula));
-      alertSuccess('La fórmula fue eliminada correctamente.');
+      void alertSuccess('La fórmula fue eliminada correctamente.');
     } catch (error) {
       console.error('Error al eliminar fórmula:', error);
       let mensajeError = 'No se pudo eliminar la fórmula. Intenta nuevamente.';
       if (error?.response?.data?.message) mensajeError = error.response.data.message;
       else if (error?.message) mensajeError = error.message;
-      alertError(mensajeError);
+      void alertError(mensajeError);
     }
   };
 
@@ -285,9 +285,17 @@ export const MisFormulasScreen = () => {
               {formulas.map((item) => (
                 <div
                   key={item.id_formula}
+                  role="button"
+                  tabIndex={0}
                   onClick={() =>
-                    navigate(`/cliente/mis-formulas/${item.id_formula}`)
+                    void navigate(`/cliente/mis-formulas/${item.id_formula}`)
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      void navigate(`/cliente/mis-formulas/${item.id_formula}`);
+                    }
+                  }}
                   className="bg-white border border-gray-200 rounded-2xl p-5 cursor-pointer hover:shadow-md hover:border-gray-300 transition relative"
                 >
                   <button
@@ -379,12 +387,16 @@ export const MisFormulasScreen = () => {
 
       {menuVisible && (
         <div
+          role="presentation"
           className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4"
           onClick={cerrarMenu}
+          onKeyDown={(e) => e.key === 'Escape' && cerrarMenu()}
         >
           <div
+            role="presentation"
             className="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             {selectedFormula && (
               <>

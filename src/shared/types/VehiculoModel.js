@@ -22,7 +22,7 @@ export class VehiculoModel {
     if (!data) return null;
     return new VehiculoModel({
       id_vehiculo: data.id_vehiculo || data.id,
-      id_usuario: data.id_usuario || data.id_usuario,
+      id_usuario: data.id_usuario,
       tipo: data.tipo || 'MOTO',
       modelo: data.modelo || '',
       placa: data.placa || '',

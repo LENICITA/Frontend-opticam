@@ -1,5 +1,3 @@
-// src/shared/validators/formulaValidators.js
-
 // CONSTANTES
 export const CONDICIONES_VALIDAS = [
   'DALTONISMO',
@@ -50,7 +48,7 @@ export const validarObservaciones = (observaciones) => {
 export const validarCosto = (costo) => {
   if (costo === undefined || costo === null || costo === '') return false;
   const num = Number(costo);
-  return !isNaN(num) && num > 0;
+  return !Number.isNaN(num) && num > 0;
 };
 
 export const validarEstado = (estado) => {
@@ -58,11 +56,9 @@ export const validarEstado = (estado) => {
   return ESTADOS_VALIDOS.includes(estado);
 };
 
-// ✅ Acepta File, Blob, { uri } (RN) y string
 export const validarExtensionImagen = (imagen) => {
   if (!imagen) return false;
 
-  // File (web)
   if (typeof File !== 'undefined' && imagen instanceof File) {
     if (imagen.type) {
       return IMAGEN_MIMES_VALIDOS.includes(imagen.type.toLowerCase());
@@ -100,7 +96,7 @@ export const validarExtensionImagen = (imagen) => {
 export const validarId = (id) => {
   if (id === undefined || id === null || id === '') return false;
   const num = Number(id);
-  return !isNaN(num) && num > 0 && Number.isInteger(num);
+  return !Number.isNaN(num) && num > 0 && Number.isInteger(num);
 };
 
 // VALIDADORES CON MENSAJE
@@ -122,7 +118,6 @@ export const checkObservaciones = (observaciones) => {
   return { valido: true };
 };
 
-// ✅ Acepta File (web), { uri } (RN), Blob y string
 export const checkImagen = (imagen) => {
   // File web
   if (typeof File !== 'undefined' && imagen instanceof File) {
@@ -176,7 +171,7 @@ export const checkCosto = (costo) => {
     return { valido: false, mensaje: MENSAJES_FORMULA.COSTO_REQUERIDO };
   }
   const num = Number(costo);
-  if (isNaN(num)) {
+  if (Number.isNaN(num)) {
     return { valido: false, mensaje: MENSAJES_FORMULA.COSTO_INVALIDO };
   }
   if (num < 0) {

@@ -31,14 +31,14 @@ const DashboardRepartidores = () => {
       setRepartidores(repartidoresMapeados);
     } catch (error) {
       console.error('Error al cargar repartidores:', error);
-      alertError('No se pudieron cargar los repartidores.');
+      void alertError('No se pudieron cargar los repartidores.');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    cargarRepartidores();
+    void cargarRepartidores();
   }, [cargarRepartidores]);
 
   const eliminarRepartidor = async (item) => {
@@ -52,14 +52,14 @@ const DashboardRepartidores = () => {
     try {
       const response = await userController.eliminarRepartidor(item.id);
       if (!response.success) {
-        return alertError(response.message || 'No se pudo eliminar.');
+        return void alertError(response.message || 'No se pudo eliminar.');
       }
 
       setRepartidores((prev) => prev.filter((r) => r.id !== item.id));
-      alertSuccess(`El repartidor "${item.nombre}" fue eliminado correctamente.`);
+      void alertSuccess(`El repartidor "${item.nombre}" fue eliminado correctamente.`);
     } catch (error) {
       console.error('Error al eliminar repartidor:', error);
-      alertError('No se pudo eliminar el repartidor.');
+      void alertError('No se pudo eliminar el repartidor.');
     }
   };
 

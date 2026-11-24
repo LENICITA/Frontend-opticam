@@ -20,8 +20,8 @@ const DetallePedidoCliente = () => {
 
   const cargarPedido = useCallback(async () => {
     if (!id) {
-      alertError('No se recibió el identificador del pedido.');
-      navigate(-1);
+      void alertError('No se recibió el identificador del pedido.');
+      void navigate(-1);
       return;
     }
 
@@ -32,22 +32,22 @@ const DetallePedidoCliente = () => {
       const pedidoCliente = misPedidos.find((p) => Number(p.id_pedido) === Number(id));
 
       if (!pedidoCliente) {
-        alertError('No puedes consultar este pedido porque no pertenece a tu cuenta.');
-        navigate(-1);
+        void alertError('No puedes consultar este pedido porque no pertenece a tu cuenta.');
+        void navigate(-1);
         return;
       }
 
       const detalle = await pedidoController.getPedidoById(Number(id));
 
       if (!detalle) {
-        alertError('No fue posible encontrar la información del pedido.');
-        navigate(-1);
+        void alertError('No fue posible encontrar la información del pedido.');
+        void navigate(-1);
         return;
       }
 
       if (!ESTADOS_ACTIVOS.includes(detalle.estado)) {
-        alertError('Este pedido ya no se encuentra disponible.');
-        navigate(-1);
+        void alertError('Este pedido ya no se encuentra disponible.');
+        void navigate(-1);
         return;
       }
 
@@ -63,14 +63,14 @@ const DetallePedidoCliente = () => {
       setPedido(detalle);
     } catch (error) {
       console.error('Error cargando detalle del pedido:', error);
-      alertError('No fue posible cargar la información del pedido.');
+      void alertError('No fue posible cargar la información del pedido.');
     } finally {
       setLoading(false);
     }
   }, [id, navigate]);
 
   useEffect(() => {
-    cargarPedido();
+    void cargarPedido();
   }, [cargarPedido]);
 
   const formatearDinero = (valor) => {
@@ -151,8 +151,10 @@ const DetallePedidoCliente = () => {
 
         {imagenAmpliada && (
           <div
+            role="presentation"
             className="fixed inset-0 bg-black/90 z-[1000] flex items-center justify-center p-4"
             onClick={() => setImagenAmpliada(null)}
+            onKeyDown={(e) => e.key === 'Escape' && setImagenAmpliada(null)}
           >
             <button
               className="absolute top-5 right-5 w-11 h-11 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition z-10"

@@ -74,8 +74,8 @@ export const RegistrarRepartidor = () => {
 
       if (result.success) {
         setSuccess('Repartidor registrado exitosamente.');
-        alertSuccess('El repartidor ha sido registrado correctamente.');
-        navigate('/admin/repartidores');
+        void alertSuccess('El repartidor ha sido registrado correctamente.');
+        void navigate('/admin/repartidores');
       } else {
         setError(result.message || 'No se pudo registrar el repartidor.');
       }
@@ -162,7 +162,7 @@ export const RegistrarRepartidor = () => {
               </div>
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="nombre-completo" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Nombres y Apellidos <span className="text-[#B90F0F]">*</span>
             </label>
 
@@ -170,6 +170,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-user text-gray-400 mr-2.5"></i>
 
               <input
+                id="nombre-completo"
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
@@ -178,7 +179,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Email <span className="text-[#B90F0F]">*</span>
             </label>
 
@@ -186,6 +187,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-envelope text-gray-400 mr-2.5"></i>
 
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -194,7 +196,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="documento" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Documento
             </label>
 
@@ -202,6 +204,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-id-card text-gray-400 mr-2.5"></i>
 
               <input
+                id="documento"
                 type="text"
                 value={documento}
                 onChange={(e) => setDocumento(e.target.value)}
@@ -210,7 +213,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="fecha-nacimiento" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Fecha de nacimiento
             </label>
 
@@ -218,6 +221,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-calendar text-gray-400 mr-2.5"></i>
 
               <input
+                id="fecha-nacimiento"
                 type="date"
                 value={fechaNacimiento}
                 onChange={(e) => setFechaNacimiento(e.target.value)}
@@ -226,7 +230,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="Ciudad" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Ciudad
             </label>
 
@@ -234,6 +238,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-location-dot text-gray-400 mr-2.5"></i>
 
               <input
+                id="Ciudad"
                 type="text"
                 value={ciudad}
                 onChange={(e) => setCiudad(e.target.value)}
@@ -242,7 +247,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="direccion" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Dirección
             </label>
 
@@ -250,6 +255,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-house text-gray-400 mr-2.5"></i>
 
               <input
+                id="direccion"
                 type="text"
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
@@ -258,7 +264,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="telefono" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Teléfono
             </label>
 
@@ -266,6 +272,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-phone text-gray-400 mr-2.5"></i>
 
               <input
+                id="telefono"
                 type="tel"
                 value={telefono}
                 onChange={(e) => setTelefono(e.target.value)}
@@ -274,7 +281,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="Contrasena" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Contraseña <span className="text-[#B90F0F]">*</span>
             </label>
 
@@ -282,6 +289,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-lock text-gray-400 mr-2.5"></i>
 
               <input
+                id="Contrasena"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -322,9 +330,9 @@ export const RegistrarRepartidor = () => {
               </div>
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <p className="block text-sm font-semibold text-gray-700 mb-1.5">
               Tipo de vehículo
-            </label>
+            </p>
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               {tiposVehiculo.map((tipo) => (
@@ -349,7 +357,7 @@ export const RegistrarRepartidor = () => {
               ))}
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="modelo-vehiculo" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Modelo del vehículo
             </label>
 
@@ -357,6 +365,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-wrench text-gray-400 mr-2.5"></i>
 
               <input
+                id="modelo-vehiculo"
                 type="text"
                 value={modelo}
                 onChange={(e) => setModelo(e.target.value)}
@@ -365,7 +374,7 @@ export const RegistrarRepartidor = () => {
               />
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="Placa" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Placa
             </label>
 
@@ -373,6 +382,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-key text-gray-400 mr-2.5"></i>
 
               <input
+                id="Placa"
                 type="text"
                 value={placa}
                 onChange={(e) => setPlaca(e.target.value.toUpperCase())}
@@ -386,7 +396,7 @@ export const RegistrarRepartidor = () => {
               <span>La placa debe ser única en el sistema</span>
             </div>
 
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor="color-vehiculo" className="block text-sm font-semibold text-gray-700 mb-1.5">
               Color del vehículo
             </label>
 
@@ -394,6 +404,7 @@ export const RegistrarRepartidor = () => {
               <i className="fa-solid fa-palette text-gray-400 mr-2.5"></i>
 
               <input
+                id="color-vehiculo"
                 type="text"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}

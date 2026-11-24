@@ -15,7 +15,7 @@ export const RecuperarContraseña = () => {
     e.preventDefault();
 
     if (!email.trim()) {
-      alertWarning('Ingresa tu correo electrónico');
+      void alertWarning('Ingresa tu correo electrónico');
       return;
     }
 
@@ -24,11 +24,11 @@ export const RecuperarContraseña = () => {
       const result = await authController.solicitarRecuperacion(email);
 
       if (result.success) {
-        alertSuccess(`Se ha enviado un enlace de recuperación a ${email}. Revisa tu correo.`);
+        void alertSuccess(`Se ha enviado un enlace de recuperación a ${email}. Revisa tu correo.`);
         setEmail('');
-        navigate('/restablecer-contrasena');
+        void navigate('/restablecer-contrasena');
       } else {
-        alertError(result.message || 'Error al enviar el correo');
+        void alertError(result.message || 'Error al enviar el correo');
       }
     } catch (error) {
       let msg = 'Error al procesar la solicitud';
@@ -37,7 +37,7 @@ export const RecuperarContraseña = () => {
       } else if (error.response?.status === 400) {
         msg = error.response?.data?.message || 'Datos inválidos';
       }
-      alertError(msg);
+      void alertError(msg);
     } finally {
       setLoading(false);
     }
@@ -64,11 +64,12 @@ export const RecuperarContraseña = () => {
 
         <form onSubmit={handleSubmit}>
 
-          <label className="block text-sm text-black mb-2 font-medium">
+          <label htmlFor="email" className="block text-sm text-black mb-2 font-medium">
             Correo electrónico
           </label>
 
           <input
+            id="email"
             type="email"
             placeholder="tucorreo@email.com"
             value={email}

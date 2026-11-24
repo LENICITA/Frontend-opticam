@@ -26,7 +26,7 @@ export const DetalleRepartidor = () => {
   }, [id]);
 
   useEffect(() => {
-    cargarDatosRepartidor();
+    void cargarDatosRepartidor();
   }, [cargarDatosRepartidor]);
 
   const formatDate = (value) => {
@@ -37,7 +37,7 @@ export const DetalleRepartidor = () => {
       if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
     const date = typeof value === 'string' ? new Date(value) : value;
-    return isNaN(date.getTime()) ? 'No disponible' : date.toLocaleDateString('es-ES');
+    return Number.isNaN(date.getTime()) ? 'No disponible' : date.toLocaleDateString('es-ES');
   };
 
   if (loading && !user) {

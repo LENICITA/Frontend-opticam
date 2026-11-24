@@ -2,6 +2,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatBotController } from '../../../core/controllers/ChatBotController';
 
+// Helper: ID único criptográficamente seguro
+function generarIdSeguro() {
+  const array = new Uint32Array(4);
+  crypto.getRandomValues(array);
+  return Array.from(array, (n) => n.toString(16).padStart(8, '0')).join('-');
+}
+
 export const ChatBot = () => {
   const chatBotController = useRef(new ChatBotController()).current;
 
@@ -22,7 +29,7 @@ export const ChatBot = () => {
 
   // ===== CARGAR BOTONES =====
   useEffect(() => {
-    cargarBotones();
+    void cargarBotones();
   }, []);
 
   const cargarBotones = async () => {
@@ -48,7 +55,7 @@ export const ChatBot = () => {
     setMensajes((prev) => [
       ...prev,
       {
-        id: Date.now().toString() + Math.random().toString(),
+        id: `${Date.now()}-${generarIdSeguro()}`,   // ✅ PRNG seguro
         texto,
         tipo,
       },
@@ -94,20 +101,20 @@ export const ChatBot = () => {
 
   // ===== SELECCIONAR BOTÓN RÁPIDO =====
   const seleccionarBoton = (boton) => {
-    enviarMensaje(boton.value);
+    void enviarMensaje(boton.value);
   };
 
   // ===== MANEJAR ENTER =====
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      enviarMensaje();
+      void enviarMensaje();
     }
   };
 
   // ===== BOTÓN FLOTANTE =====
   if (!abierto) {
-        return (
+    return (
       <button
         onClick={() => setAbierto(true)}
         className="fixed right-5 bottom-[150px] w-14 h-14 rounded-full bg-[#B90F0F] flex items-center justify-center shadow-xl hover:bg-[#9f0d0d] hover:scale-105 transition-all duration-200 z-[999]"
@@ -121,17 +128,21 @@ export const ChatBot = () => {
   }
 
   // ===== VENTANA DEL CHAT =====
-    return (
+  return (
     <>
       {/* OVERLAY */}
       <div
+        role="presentation"
         className="fixed inset-0 bg-black/30 z-[1000] flex items-end justify-end p-4 sm:p-6"
-        onClick={() => setAbierto(false)}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         {/* VENTANA DEL CHAT */}
         <div
+          role="presentation"
           className="w-full sm:w-[390px] h-[520px] max-h-[calc(100vh-2rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col z-[1001] sm:mr-2 sm:mb-14"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
         >
 
           {/* HEADER */}
