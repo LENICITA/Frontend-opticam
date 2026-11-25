@@ -107,8 +107,8 @@ const EditarRepartidor = () => {
     if (errores[campo]) setErrores((prev) => ({ ...prev, [campo]: null }));
   };
 
-  // ✅ Confirmación con window.confirm (100% confiable en Vercel)
-  const handleEstadoChange = (nuevoEstado) => {
+  // ✅ Confirmación con SweetAlert (alertConfirm)
+  const handleEstadoChange = async (nuevoEstado) => {
     const estadoActual = formData.datosPersonales.estado;
 
     if (nuevoEstado === estadoActual) return;
@@ -118,9 +118,12 @@ const EditarRepartidor = () => {
     const etiquetaActual =
       ESTADOS_REPARTIDOR.find((e) => e.value === estadoActual)?.label || estadoActual;
 
-    const confirmado = window.confirm(
-      `¿Estás seguro de cambiar el estado de "${etiquetaActual}" a "${etiquetaNueva}"?`
-    );
+    const confirmado = await alertConfirm({
+      title: '¿Cambiar estado de repartidor?',
+      text: `¿Estás seguro de cambiar el estado de "${etiquetaActual}" a "${etiquetaNueva}"?`,
+      confirmButtonText: 'Sí, cambiar',
+      cancelButtonText: 'Cancelar',
+    });
 
     if (!confirmado) {
       // Forzar reset visual del select al valor anterior
@@ -279,22 +282,6 @@ const EditarRepartidor = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      {/* 🚨 PRUEBA VISUAL — si no ves esto en Vercel, el archivo no es el correcto */}
-      <div
-        style={{
-          background: '#111',
-          color: '#0f0',
-          padding: 16,
-          fontSize: 20,
-          textAlign: 'center',
-          marginBottom: 16,
-          fontWeight: 'bold',
-          borderRadius: 8,
-        }}
-      >
-        ✅ ARCHIVO CORRECTO — BUILD NUEVO — {new Date().toLocaleString('es-CO')}
-      </div>
-
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-5">
           <button
@@ -430,33 +417,30 @@ const EditarRepartidor = () => {
                 type="date"
               />
 
-              {/* 🚨 BOTÓN TEMPORAL DE PRUEBA — reemplaza al select para diagnosticar */}
               <div className="mb-3.5">
-                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
-                  Estado (prueba)
-                </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.alert('BOTÓN PRESIONADO — estado actual: ' + formData.datosPersonales.estado);
-                    handleEstadoChange(
-                      formData.datosPersonales.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO'
-                    );
-                  }}
-                  style={{
-                    background: '#B90F0F',
-                    color: 'white',
-                    padding: 16,
-                    width: '100%',
-                    fontSize: 16,
-                    borderRadius: 8,
-                    fontWeight: 'bold',
-                  }}
+                <label
+                  htmlFor="estado-select"
+                  className="text-sm font-semibold text-gray-700 mb-1.5 block"
                 >
-                  {formData.datosPersonales.estado === 'ACTIVO'
-                    ? '🟢 ACTIVO → cambiar a INACTIVO'
-                    : '🔴 INACTIVO → cambiar a ACTIVO'}
-                </button>
+                  Estado
+                </label>
+
+                <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 min-h-[46px] focus-within:border-[#B90F0F] transition">
+                  <i className="fa-solid fa-circle-dot text-[#B90F0F] mr-2.5"></i>
+
+                  <select
+                    id="estado-select"
+                    value={formData.datosPersonales.estado}
+                    onChange={(e) => void handleEstadoChange(e.target.value)}
+                    className="flex-1 bg-transparent outline-none text-[15px] text-gray-700 py-2.5"
+                  >
+                    {ESTADOS_REPARTIDOR.map((e) => (
+                      <option key={e.value} value={e.value}>
+                        {e.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
