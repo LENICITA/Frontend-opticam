@@ -107,7 +107,10 @@ const EditarRepartidor = () => {
     if (errores[campo]) setErrores((prev) => ({ ...prev, [campo]: null }));
   };
 
-  const handleEstadoChange = async (nuevoEstado) => {
+  // ✅ Confirmación antes de cambiar el estado del repartidor
+  // Usamos setTimeout para que SweetAlert no sea bloqueado por el navegador
+  // (algunos navegadores requieren que el modal se abra en un "user gesture" limpio)
+  const handleEstadoChange = (nuevoEstado) => {
     const estadoActual = formData.datosPersonales.estado;
 
     if (nuevoEstado === estadoActual) return;
@@ -117,19 +120,22 @@ const EditarRepartidor = () => {
     const etiquetaActual =
       ESTADOS_REPARTIDOR.find((e) => e.value === estadoActual)?.label || estadoActual;
 
-    const confirmado = await alertConfirm({
-      title: '¿Cambiar estado de repartidor?',
-      text: `¿Estás seguro de cambiar el estado de "${etiquetaActual}" a "${etiquetaNueva}"?`,
-      confirmButtonText: 'Sí, cambiar',
-      cancelButtonText: 'Cancelar',
-    });
+    setTimeout(async () => {
+      const confirmado = await alertConfirm({
+        title: '¿Cambiar estado de repartidor?',
+        text: `¿Estás seguro de cambiar el estado de "${etiquetaActual}" a "${etiquetaNueva}"?`,
+        confirmButtonText: 'Sí, cambiar',
+        cancelButtonText: 'Cancelar',
+      });
 
-    if (!confirmado) {
-      setFormData((prev) => ({ ...prev }));
-      return;
-    }
+      if (!confirmado) {
+        // Forzar reset visual del select por si el navegador no lo revierte solo
+        setFormData((prev) => ({ ...prev }));
+        return;
+      }
 
-    handleInputChange('datosPersonales', 'estado', nuevoEstado);
+      handleInputChange('datosPersonales', 'estado', nuevoEstado);
+    }, 0);
   };
 
   const validarFormulario = () => {
@@ -429,7 +435,7 @@ const EditarRepartidor = () => {
                   <select
                     id="estado-select"
                     value={formData.datosPersonales.estado}
-                    onChange={(e) => void handleEstadoChange(e.target.value)}
+                    onChange={(e) => handleEstadoChange(e.target.value)}
                     className="flex-1 bg-transparent outline-none text-[15px] text-gray-700 py-2.5"
                   >
                     {ESTADOS_REPARTIDOR.map((e) => (
