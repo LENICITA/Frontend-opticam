@@ -8,7 +8,6 @@ export const RestablecerContraseña = () => {
   const [searchParams] = useSearchParams();
   const tokenFromUrl = searchParams.get('token') || '';
 
-  const [token, setToken] = useState(tokenFromUrl);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,32 +16,12 @@ export const RestablecerContraseña = () => {
   const navigate = useNavigate();
   const authController = new AuthController();
 
-  useEffect(() => {
-    if (tokenFromUrl) {
-      setToken(tokenFromUrl);
-    }
-  }, [tokenFromUrl]);
-
-  const extraerToken = (texto) => {
-    if (texto.includes('token=')) {
-      const match = texto.match(/token=([^&]+)/);
-      if (match) return match[1];
-    }
-    return texto;
-  };
-
-  const handleTokenChange = (text) => {
-    const tokenExtraido = extraerToken(text);
-    setToken(tokenExtraido);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!token || token.trim() === '') {
-      void alertWarning('Debes ingresar el enlace de recuperación que recibiste en el correo');
+    if (!tokenFromUrl) {
+      void alertWarning('El enlace de recuperación no es válido. Solicita uno nuevo.');
       return;
-    }
 
     if (newPassword.length < 8) {
       void alertWarning('La contraseña debe tener al menos 8 caracteres');
@@ -56,7 +35,7 @@ export const RestablecerContraseña = () => {
 
     setLoading(true);
     try {
-      const result = await authController.resetearPassword(token, newPassword);
+      const result = await authController.resetearPassword(tokenFromUrl, newPassword);
 
       if (result.success) {
         void alertSuccess('Contraseña actualizada exitosamente');
@@ -70,7 +49,26 @@ export const RestablecerContraseña = () => {
       setLoading(false);
     }
   };
-
+    
+if (!tokenFromUrl) {
+  return (
+      <div className="min-h-[calc(100vh-94px)] bg-gray-50 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-[500px] bg-white p-8 rounded-2xl shadow-lg text-center">
+          <i className="fa-solid fa-circle-exclamation text-[#B90F0F] text-5xl mb-4"></i>
+          <h2 className="text-xl font-bold text-gray-800 mb-3">Enlace inválido</h2>
+          <p className="text-sm text-gray-600 mb-6">
+            Este enlace no contiene un token de recuperación válido. Solicita uno nuevo.
+          </p>
+          <Link
+            to="/recuperar-contrasena"
+            className="inline-block px-6 py-3 bg-[#B90F0F] text-white rounded-xl font-semibold hover:bg-red-800 transition"
+          >
+            Solicitar nuevo enlace
+          </Link>
+        </div>
+      </div>
+    );
+  }
   return (
   <div className="min-h-[calc(100vh-94px)] bg-gray-50 flex items-center justify-center px-6 py-12">
     <div className="w-full max-w-[500px]">
@@ -87,39 +85,19 @@ export const RestablecerContraseña = () => {
         <form onSubmit={handleSubmit}>
 
           <div>
-            <label htmlFor="enlace" className="block text-sm text-black mb-2 font-medium">
-              Enlace de recuperación
-            </label>
-
-            <textarea
-              id="enlace"
-              value={token}
-              onChange={(e) => handleTokenChange(e.target.value)}
-              placeholder="Pega aquí el enlace que recibiste en el correo"
-              autoCapitalize="none"
-              rows={3}
-              className="w-full px-4 py-3 border-2 border-[#B90F0F] bg-red-50 rounded-xl text-base outline-none resize-none focus:border-[#B90F0F] transition"
-            />
-
-            <p className="text-xs text-gray-500 mt-2 mb-6">
-              Copia el enlace del correo y pégalo aquí
-            </p>
-          </div>
-
-          <div>
             <label htmlFor="Nueva-contrasena" className="block text-sm text-black mb-2 font-medium">
               Nueva contraseña
             </label>
 
             <div className="flex items-center border border-gray-300 rounded-xl bg-white focus-within:border-[#B90F0F] transition">
-              <input
-                id="Nueva-contrasena"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Mínimo 8 caracteres"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="flex-1 px-4 py-3 text-base outline-none bg-transparent"
-              />
+                <input
+                  id="Nueva-contrasena"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Mínimo 8 caracteres"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="flex-1 px-4 py-3 text-base outline-none bg-transparent"
+                />
 
               <button
                 type="button"
