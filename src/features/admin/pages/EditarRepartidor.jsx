@@ -279,6 +279,22 @@ const EditarRepartidor = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* 🚨 PRUEBA VISUAL — si no ves esto en Vercel, el archivo no es el correcto */}
+      <div
+        style={{
+          background: '#111',
+          color: '#0f0',
+          padding: 16,
+          fontSize: 20,
+          textAlign: 'center',
+          marginBottom: 16,
+          fontWeight: 'bold',
+          borderRadius: 8,
+        }}
+      >
+        ✅ ARCHIVO CORRECTO — BUILD NUEVO — {new Date().toLocaleString('es-CO')}
+      </div>
+
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-5">
           <button
@@ -414,30 +430,33 @@ const EditarRepartidor = () => {
                 type="date"
               />
 
+              {/* 🚨 BOTÓN TEMPORAL DE PRUEBA — reemplaza al select para diagnosticar */}
               <div className="mb-3.5">
-                <label
-                  htmlFor="estado-select"
-                  className="text-sm font-semibold text-gray-700 mb-1.5 block"
-                >
-                  Estado
+                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                  Estado (prueba)
                 </label>
-
-                <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 min-h-[46px] focus-within:border-[#B90F0F] transition">
-                  <i className="fa-solid fa-circle-dot text-[#B90F0F] mr-2.5"></i>
-
-                  <select
-                    id="estado-select"
-                    value={formData.datosPersonales.estado}
-                    onChange={(e) => handleEstadoChange(e.target.value)}
-                    className="flex-1 bg-transparent outline-none text-[15px] text-gray-700 py-2.5"
-                  >
-                    {ESTADOS_REPARTIDOR.map((e) => (
-                      <option key={e.value} value={e.value}>
-                        {e.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.alert('BOTÓN PRESIONADO — estado actual: ' + formData.datosPersonales.estado);
+                    handleEstadoChange(
+                      formData.datosPersonales.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO'
+                    );
+                  }}
+                  style={{
+                    background: '#B90F0F',
+                    color: 'white',
+                    padding: 16,
+                    width: '100%',
+                    fontSize: 16,
+                    borderRadius: 8,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {formData.datosPersonales.estado === 'ACTIVO'
+                    ? '🟢 ACTIVO → cambiar a INACTIVO'
+                    : '🔴 INACTIVO → cambiar a ACTIVO'}
+                </button>
               </div>
             </div>
 
