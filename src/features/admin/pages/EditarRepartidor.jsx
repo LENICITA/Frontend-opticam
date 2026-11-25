@@ -107,9 +107,7 @@ const EditarRepartidor = () => {
     if (errores[campo]) setErrores((prev) => ({ ...prev, [campo]: null }));
   };
 
-  // ✅ Confirmación antes de cambiar el estado del repartidor
-  // Usamos setTimeout para que SweetAlert no sea bloqueado por el navegador
-  // (algunos navegadores requieren que el modal se abra en un "user gesture" limpio)
+  // ✅ Confirmación con window.confirm (100% confiable en Vercel)
   const handleEstadoChange = (nuevoEstado) => {
     const estadoActual = formData.datosPersonales.estado;
 
@@ -120,22 +118,17 @@ const EditarRepartidor = () => {
     const etiquetaActual =
       ESTADOS_REPARTIDOR.find((e) => e.value === estadoActual)?.label || estadoActual;
 
-    setTimeout(async () => {
-      const confirmado = await alertConfirm({
-        title: '¿Cambiar estado de repartidor?',
-        text: `¿Estás seguro de cambiar el estado de "${etiquetaActual}" a "${etiquetaNueva}"?`,
-        confirmButtonText: 'Sí, cambiar',
-        cancelButtonText: 'Cancelar',
-      });
+    const confirmado = window.confirm(
+      `¿Estás seguro de cambiar el estado de "${etiquetaActual}" a "${etiquetaNueva}"?`
+    );
 
-      if (!confirmado) {
-        // Forzar reset visual del select por si el navegador no lo revierte solo
-        setFormData((prev) => ({ ...prev }));
-        return;
-      }
+    if (!confirmado) {
+      // Forzar reset visual del select al valor anterior
+      setFormData((prev) => ({ ...prev }));
+      return;
+    }
 
-      handleInputChange('datosPersonales', 'estado', nuevoEstado);
-    }, 0);
+    handleInputChange('datosPersonales', 'estado', nuevoEstado);
   };
 
   const validarFormulario = () => {
