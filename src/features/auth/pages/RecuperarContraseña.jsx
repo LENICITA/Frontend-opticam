@@ -24,9 +24,8 @@ export const RecuperarContraseña = () => {
       const result = await authController.solicitarRecuperacion(email);
 
       if (result.success) {
-        void alertSuccess(`Se ha enviado un enlace de recuperación a ${email}. Revisa tu correo.`);
+        void alertSuccess(`Se ha enviado un enlace de recuperación a ${email}. Revisa tu correo y haz clic en el botón.`);
         setEmail('');
-        void navigate('/restablecer-contrasena');
       } else {
         void alertError(result.message || 'Error al enviar el correo');
       }
