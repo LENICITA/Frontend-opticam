@@ -1,11 +1,12 @@
 import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DistribucionController } from '../../../core/controllers/DistribucionController';
 import { PageHeader } from '../../../shared/components/ui/PageHeader';
 import { SearchFilters } from '../../../shared/components/ui/SearchFilters';
 import { ModalBase } from '../../../shared/components/ui/ModalBase';
 import { CardInfo, EstadoBadge } from '../../../shared/components/ui/CardInfo';
 import { BaseCard, CardHeader, CardDivider } from '../../../shared/components/ui/BaseCard';
-// ✅ Importamos las funciones y el diccionario
+
 import { 
   DISTRIBUCIONES_ESTADOS, 
   getEstadoColor, 
@@ -23,6 +24,7 @@ const ESTADOS_FILTRO = [
 
 export const GestionarDistribucionesAdmin = () => {
   const distribucionController = new DistribucionController();
+  const navigate = useNavigate();
 
   const [distribuciones, setDistribuciones] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +118,7 @@ export const GestionarDistribucionesAdmin = () => {
         <SearchFilters 
           busqueda={busqueda} setBusqueda={setBusqueda} placeholder="Buscar por cliente, ciudad o repartidor..." 
           filtros={ESTADOS_FILTRO} filtroActivo={filtroEstado} setFiltroActivo={setFiltroEstado}
-          textoBotonExtra="Ver distribuciones externas" onBotonExtra={() => {}} 
+          textoBotonExtra="Ver distribuciones externas" onBotonExtra={() => navigate('/admin/distribuciones-externas')} 
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
