@@ -26,7 +26,7 @@ const Home = () => {
               className="card relative mb-5 transition-transform hover:scale-95 h-[180px] text-white flex justify-center items-center text-2xl font-bold overflow-hidden bg-cover bg-center before:content-[''] before:absolute before:inset-0 before:bg-black/50" 
               style={{ backgroundImage: "url('/img/card.jpg')" }}
             >
-              <span className="relative z-10">Conócenos</span>
+              <span className="relative z-10">Contáctanos</span>
             </div>
           </Link>
           <Link to="/catalogo" className="block">
