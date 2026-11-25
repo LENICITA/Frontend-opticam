@@ -95,6 +95,25 @@ const EditarRepartidor = () => {
     setFormModificado(true);
     if (errores[campo]) setErrores((prev) => ({ ...prev, [campo]: null }));
   };
+  const handleEstadoChange = async (nuevoEstado) => {
+    const estadoActual = formData.datosPersonales.estado;
+
+    if (nuevoEstado === estadoActual) return;
+
+    const etiquetaNueva = ESTADOS_REPARTIDOR.find((e) => e.value === nuevoEstado)?.label || nuevoEstado;
+    const etiquetaActual = ESTADOS_REPARTIDOR.find((e) => e.value === estadoActual)?.label || estadoActual;
+
+    const confirmado = await alertConfirm({
+      title: '¿Cambiar estado de repartidor?',
+      text: `¿Estas seguro de cambiar el estado de "${etiquetaActual}" a "${etiquetaNueva}"?`,
+      confirmButtonText: 'Si, cambiar',
+      cancelButtonText: 'Cancelar',
+    });
+
+    if (!confirmado) return;
+
+    handleInputChange('datosPersonales', 'estado', nuevoEstado);
+  };
 
   const validarFormulario = () => {
     const nuevosErrores = {};
@@ -399,13 +418,7 @@ const EditarRepartidor = () => {
                 <select
                   id="estado-select"
                   value={formData.datosPersonales.estado}
-                  onChange={(e) =>
-                    handleInputChange(
-                      'datosPersonales',
-                      'estado',
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => void handleEstadoChange(e.target.value)}
                   className="flex-1 bg-transparent outline-none text-[15px] text-gray-700 py-2.5"
                 >
                   {ESTADOS_REPARTIDOR.map((e) => (
