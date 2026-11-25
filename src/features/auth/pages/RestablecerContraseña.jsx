@@ -1,5 +1,5 @@
 // src/features/auth/pages/RestablecerContraseña.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthController } from '../../../core/controllers/AuthController';
 import { alertError, alertSuccess, alertWarning } from '../../../shared/utils/alert';
@@ -22,12 +22,11 @@ export const RestablecerContraseña = () => {
     if (!tokenFromUrl) {
       void alertWarning('El enlace de recuperación no es válido. Solicita uno nuevo.');
       return;
-
+    }
     if (newPassword.length < 8) {
       void alertWarning('La contraseña debe tener al menos 8 caracteres');
       return;
     }
-
     if (newPassword !== confirmPassword) {
       void alertWarning('Las contraseñas no coinciden');
       return;
@@ -36,7 +35,6 @@ export const RestablecerContraseña = () => {
     setLoading(true);
     try {
       const result = await authController.resetearPassword(tokenFromUrl, newPassword);
-
       if (result.success) {
         void alertSuccess('Contraseña actualizada exitosamente');
         void navigate('/login');
@@ -49,9 +47,9 @@ export const RestablecerContraseña = () => {
       setLoading(false);
     }
   };
-    
-if (!tokenFromUrl) {
-  return (
+
+  if (!tokenFromUrl) {
+    return (
       <div className="min-h-[calc(100vh-94px)] bg-gray-50 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-[500px] bg-white p-8 rounded-2xl shadow-lg text-center">
           <i className="fa-solid fa-circle-exclamation text-[#B90F0F] text-5xl mb-4"></i>
@@ -69,27 +67,22 @@ if (!tokenFromUrl) {
       </div>
     );
   }
+
   return (
-  <div className="min-h-[calc(100vh-94px)] bg-gray-50 flex items-center justify-center px-6 py-12">
-    <div className="w-full max-w-[500px]">
+    <div className="min-h-[calc(100vh-94px)] bg-gray-50 flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-[500px]">
+        <div className="bg-[#B90F0F] py-7 px-10 rounded-2xl flex flex-col items-center mb-6">
+          <i className="fa-solid fa-key text-white text-5xl"></i>
+          <h2 className="text-white text-[24px] font-bold mt-3 text-center">Nueva contraseña</h2>
+        </div>
 
-      <div className="bg-[#B90F0F] py-7 px-10 rounded-2xl flex flex-col items-center mb-6">
-        <i className="fa-solid fa-key text-white text-5xl"></i>
-
-        <h2 className="text-white text-[24px] font-bold mt-3 text-center">
-          Nueva contraseña
-        </h2>
-      </div>
-
-      <div className="bg-white w-full p-8 rounded-2xl shadow-lg">
-        <form onSubmit={handleSubmit}>
-
-          <div>
-            <label htmlFor="Nueva-contrasena" className="block text-sm text-black mb-2 font-medium">
-              Nueva contraseña
-            </label>
-
-            <div className="flex items-center border border-gray-300 rounded-xl bg-white focus-within:border-[#B90F0F] transition">
+        <div className="bg-white w-full p-8 rounded-2xl shadow-lg">
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="Nueva-contrasena" className="block text-sm text-black mb-2 font-medium">
+                Nueva contraseña
+              </label>
+              <div className="flex items-center border border-gray-300 rounded-xl bg-white focus-within:border-[#B90F0F] transition">
                 <input
                   id="Nueva-contrasena"
                   type={showPassword ? 'text' : 'password'}
@@ -98,59 +91,52 @@ if (!tokenFromUrl) {
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="flex-1 px-4 py-3 text-base outline-none bg-transparent"
                 />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="px-3 text-gray-500 hover:text-gray-700 transition"
-                aria-label="Mostrar contraseña"
-              >
-                <i
-                  className={`fa-solid ${
-                    showPassword ? 'fa-eye-slash' : 'fa-eye'
-                  } text-xl`}
-                ></i>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="px-3 text-gray-500 hover:text-gray-700 transition"
+                  aria-label="Mostrar contraseña"
+                >
+                  <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-xl`}></i>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-5">
-            <label htmlFor="confirmar-contrasena" className="block text-sm text-black mb-2 font-medium">
-              Confirmar contraseña
-            </label>
+            <div className="mt-5">
+              <label htmlFor="confirmar-contrasena" className="block text-sm text-black mb-2 font-medium">
+                Confirmar contraseña
+              </label>
+              <input
+                id="confirmar-contrasena"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Repite tu nueva contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base outline-none focus:border-[#B90F0F] transition"
+              />
+            </div>
 
-            <input
-              id="confirmar-contrasena"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Repite tu nueva contraseña"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base outline-none focus:border-[#B90F0F] transition"
-            />
-          </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-7 py-3.5 bg-[#B90F0F] text-white rounded-xl font-semibold hover:bg-red-800 transition disabled:opacity-60 flex items-center justify-center"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                'Actualizar contraseña'
+              )}
+            </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-7 py-3.5 bg-[#B90F0F] text-white rounded-xl font-semibold hover:bg-red-800 transition disabled:opacity-60 flex items-center justify-center"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              'Actualizar contraseña'
-            )}
-          </button>
-
-          <Link
-            to="/login"
-            className="block text-center text-[#B90F0F] text-sm mt-5 underline hover:text-red-800"
-          >
-            ← Volver al inicio de sesión
-          </Link>
-
-        </form>
+            <Link
+              to="/login"
+              className="block text-center text-[#B90F0F] text-sm mt-5 underline hover:text-red-800"
+            >
+              ← Volver al inicio de sesión
+            </Link>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
