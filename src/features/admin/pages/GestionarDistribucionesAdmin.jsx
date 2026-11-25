@@ -118,7 +118,7 @@ export const GestionarDistribucionesAdmin = () => {
         <SearchFilters 
           busqueda={busqueda} setBusqueda={setBusqueda} placeholder="Buscar por cliente, ciudad o repartidor..." 
           filtros={ESTADOS_FILTRO} filtroActivo={filtroEstado} setFiltroActivo={setFiltroEstado}
-          textoBotonExtra="Ver distribuciones externas" onBotonExtra={() => navigate('/admin/distribuciones-externas')} 
+          textoBotonExtra="Ver distribuciones externas" onBotonExtra={() => navigate('/admin/distribuciones/externas')} 
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
