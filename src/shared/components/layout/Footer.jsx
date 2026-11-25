@@ -36,9 +36,6 @@ export const Footer = () => {
         <Link to="/" className="text-sm cursor-pointer hover:text-[#B90F0F] transition">
           Inicio
         </Link>
-        <Link to="/catalogo" className="text-sm cursor-pointer hover:text-[#B90F0F] transition">
-          Catálogo
-        </Link>
         <Link to="/contacto" className="text-sm cursor-pointer hover:text-[#B90F0F] transition">
           Acerca de
         </Link>
