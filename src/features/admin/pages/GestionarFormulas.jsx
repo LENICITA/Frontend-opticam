@@ -420,7 +420,7 @@ const GestionarFormulas = () => {
                   <div className="flex items-start gap-3">
 
                     <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-                      <i className="fa-solid fa-trash text-[#B90F0F] text-lg"></i>
+                      <i className="fa-solid fa-file-prescription text-[#B90F0F] text-lg"></i>
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -460,7 +460,7 @@ const GestionarFormulas = () => {
                           : 'text-gray-300'
                       }`}
                     >
-                      <i className="fa-solid fa-ellipsis-vertical"></i>
+                      <i className="fa-solid fa-trash"></i>
                     </button>
 
                   </div>
