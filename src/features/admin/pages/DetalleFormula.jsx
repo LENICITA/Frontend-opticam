@@ -1,9 +1,8 @@
-// src/features/admin/pages/DetalleFormula.jsx 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FormulaController } from '../../../core/controllers/FormulaController';
 import { validarAsignarPrecio } from '../../../shared/validators/formulaValidators';
-import {alertError, alertConfirm} from '../../../../src/shared/utils/alert';
+import { alertError, alertConfirm } from '../../../../src/shared/utils/alert';
 
 const DetalleFormula = () => {
   const { id_formula } = useParams();
@@ -46,24 +45,19 @@ const DetalleFormula = () => {
 
   const cambiarCosto = async () => {
     try {
-      const check = validarAsignarPrecio({
-        id_formula: id_formula ? Number(id_formula) : undefined,
-        costo: costo,
-        estadoActualFormula: formula?.estado,
-      });
-
-      if (!check.valido) {
-        void alertError(check.mensaje || 'Datos inválidos');
-        return;
-      }
-
       setLoading(true);
 
-      const resultadoCosto = await formulaController.actualizarCostoFormula(Number(id_formula), Number(costo));
+      const resultadoCosto = await formulaController.actualizarCostoFormula(
+        Number(id_formula),
+        Number(costo)
+      );
 
       if (resultadoCosto.success) {
         if (formula?.estado === 'Pendiente') {
-          const resultadoEstado = await formulaController.actualizarEstadoFormula(Number(id_formula), 'Aprobado');
+          const resultadoEstado = await formulaController.actualizarEstadoFormula(
+            Number(id_formula),
+            'Aprobado'
+          );
 
           if (resultadoEstado.success) {
             setCosto('');
@@ -84,6 +78,33 @@ const DetalleFormula = () => {
       void alertError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleConfirmarCosto = async () => {
+    const check = validarAsignarPrecio({
+      id_formula: id_formula ? Number(id_formula) : undefined,
+      costo: costo,
+      estadoActualFormula: formula?.estado,
+    });
+
+    if (!check.valido) {
+      void alertError(check.mensaje || 'Datos inválidos');
+      return;
+    }
+
+    const esAprobado = formula?.estado === 'Aprobado';
+
+    const confirmado = await alertConfirm({
+      title: esAprobado ? 'Confirmar actualización' : 'Confirmar asignación',
+      text: esAprobado
+        ? `¿Está seguro de que desea actualizar el costo a $${costo}?`
+        : `¿Está seguro de que desea asignar el costo de $${costo} y aprobar la fórmula?`,
+      confirmButtonText: esAprobado ? 'Sí, actualizar' : 'Sí, asignar y aprobar',
+    });
+
+    if (confirmado) {
+      await cambiarCosto();
     }
   };
 
@@ -146,7 +167,7 @@ const DetalleFormula = () => {
           value={costo}
           onChange={(e) => {
             let valor = e.target.value.replace(/[^0-9]/g, '');
-            valor = valor.replace(/^0+/, ''); 
+            valor = valor.replace(/^0+/, '');
             setCosto(valor);
           }}
           placeholder="Ingrese el costo"
@@ -154,7 +175,7 @@ const DetalleFormula = () => {
         />
         <div className="flex gap-2.5 mt-1">
           <button
-            onClick={cambiarCosto}
+            onClick={handleConfirmarCosto}
             className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-[#B90F0F] text-white rounded-xl font-bold"
           >
             <i className="fa-solid fa-pen"></i>
@@ -184,153 +205,140 @@ const DetalleFormula = () => {
   }
 
   return (
-  <>
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-5xl mx-auto pb-10">
+    <>
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-5xl mx-auto pb-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-[#B90F0F] font-semibold mb-5 px-1 py-2 hover:opacity-80 transition"
+          >
+            <i className="fa-solid fa-arrow-left"></i>
+            Volver
+          </button>
 
-        {/* BOTÓN VOLVER */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-[#B90F0F] font-semibold mb-5 px-1 py-2 hover:opacity-80 transition"
-        >
-          <i className="fa-solid fa-arrow-left"></i>
-          Volver
-        </button>
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                <i className="fa-solid fa-file-lines text-[#B90F0F] text-xl"></i>
+              </div>
 
-        {/* ENCABEZADO */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-              <i className="fa-solid fa-file-lines text-[#B90F0F] text-xl"></i>
-            </div>
-
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Datos de la formula #{id_formula}
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Información y gestión de la fórmula registrada
-              </p>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  Datos de la formula #{id_formula}
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Información y gestión de la fórmula registrada
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* CONTENIDO */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
+              <h3 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i className="fa-solid fa-image text-[#B90F0F]"></i>
+                Imagen de la fórmula
+              </h3>
 
-          {/* IMAGEN */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
-            <h3 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-image text-[#B90F0F]"></i>
-              Imagen de la fórmula
-            </h3>
+              <button
+                onClick={abrirImagen}
+                className="relative w-full h-[350px] sm:h-[420px] bg-gray-50 rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center group"
+              >
+                <img
+                  src={formula?.imagen_formula}
+                  alt="Fórmula"
+                  className="w-full h-full object-contain p-3 group-hover:scale-[1.02] transition-transform duration-200"
+                />
 
-            <button
-              onClick={abrirImagen}
-              className="relative w-full h-[350px] sm:h-[420px] bg-gray-50 rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center group"
-            >
-              <img
-                src={formula?.imagen_formula}
-                alt="Fórmula"
-                className="w-full h-full object-contain p-3 group-hover:scale-[1.02] transition-transform duration-200"
-              />
-
-              <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-black/60 px-3 py-1.5 rounded-[20px]">
-                <i className="fa-solid fa-expand text-white"></i>
-                <span className="text-white text-xs">Toca para ampliar</span>
-              </div>
-            </button>
-          </div>
-
-          {/* INFORMACIÓN */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
-
-            <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
-              <i className="fa-solid fa-circle-info text-[#B90F0F]"></i>
-              Información de la fórmula
-            </h3>
-
-            {/* CONDICIÓN */}
-            <div className="mb-5 pb-5 border-b border-gray-100">
-              <p className="text-sm font-bold text-gray-900 mb-2">
-                Condición:
-              </p>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-100">
-                <p className="text-gray-700 text-sm">
-                  {formula?.condicion}
-                </p>
-              </div>
+                <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-black/60 px-3 py-1.5 rounded-[20px]">
+                  <i className="fa-solid fa-expand text-white"></i>
+                  <span className="text-white text-xs">Toca para ampliar</span>
+                </div>
+              </button>
             </div>
 
-            {/* OBSERVACIÓN */}
-            <div className="mb-5 pb-5 border-b border-gray-100">
-              <p className="text-sm font-bold text-gray-900 mb-2">
-                Observación:
-              </p>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-100 min-h-[70px]">
-                <p className="text-gray-700 text-sm">
-                  {formula?.observaciones}
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
+              <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                <i className="fa-solid fa-circle-info text-[#B90F0F]"></i>
+                Información de la fórmula
+              </h3>
+
+              <div className="mb-5 pb-5 border-b border-gray-100">
+                <p className="text-sm font-bold text-gray-900 mb-2">
+                  Condición:
                 </p>
+                <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-100">
+                  <p className="text-gray-700 text-sm">
+                    {formula?.condicion}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* FECHA */}
-            <div className="mb-5 pb-5 border-b border-gray-100">
-              <p className="text-sm font-bold text-gray-900 mb-2">
-                Fecha:
-              </p>
-              <div className="flex items-center gap-2 text-gray-700">
-                <i className="fa-regular fa-calendar text-[#B90F0F]"></i>
-                <p className="text-sm">
-                  {formula?.fecha_creacion}
+              <div className="mb-5 pb-5 border-b border-gray-100">
+                <p className="text-sm font-bold text-gray-900 mb-2">
+                  Observación:
                 </p>
+                <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-100 min-h-[70px]">
+                  <p className="text-gray-700 text-sm">
+                    {formula?.observaciones}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* COSTO */}
-            <div>
-              <p className="text-sm font-bold text-gray-900 mb-2">
-                Costo:
-              </p>
+              <div className="mb-5 pb-5 border-b border-gray-100">
+                <p className="text-sm font-bold text-gray-900 mb-2">
+                  Fecha:
+                </p>
+                <div className="flex items-center gap-2 text-gray-700">
+                  <i className="fa-regular fa-calendar text-[#B90F0F]"></i>
+                  <p className="text-sm">
+                    {formula?.fecha_creacion}
+                  </p>
+                </div>
+              </div>
 
-              {renderCostoSection()}
+              <div>
+                <p className="text-sm font-bold text-gray-900 mb-2">
+                  Costo:
+                </p>
+
+                {renderCostoSection()}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    {/* MODAL IMAGEN */}
-    {imagenModalVisible && (
-      <div
-        role="presentation"
-        className="fixed inset-0 bg-black/90 z-[1000] flex items-center justify-center p-4"
-        onClick={cerrarImagen}
-        onKeyDown={(e) => e.key === 'Escape' && cerrarImagen()}
-      >
-        <button
+      {imagenModalVisible && (
+        <div
+          role="presentation"
+          className="fixed inset-0 bg-black/90 z-[1000] flex items-center justify-center p-4"
           onClick={cerrarImagen}
-          className="absolute top-6 right-5 sm:top-10 sm:right-8 z-10 hover:scale-110 transition-transform"
+          onKeyDown={(e) => e.key === 'Escape' && cerrarImagen()}
         >
-          <i className="fa-solid fa-circle-xmark text-white text-4xl"></i>
-        </button>
+          <button
+            onClick={cerrarImagen}
+            className="absolute top-6 right-5 sm:top-10 sm:right-8 z-10 hover:scale-110 transition-transform"
+          >
+            <i className="fa-solid fa-circle-xmark text-white text-4xl"></i>
+          </button>
 
-        <img
-          src={formula?.imagen_formula}
-          alt="Fórmula ampliada"
-          className="max-w-[95%] max-h-[75vh] w-auto h-auto object-contain"
-        />
+          <img
+            src={formula?.imagen_formula}
+            alt="Fórmula ampliada"
+            className="max-w-[95%] max-h-[75vh] w-auto h-auto object-contain"
+          />
 
-        <div className="absolute bottom-8 flex items-center gap-2 bg-black/50 px-4 py-2 rounded-[20px]">
-          <i className="fa-solid fa-hand text-white/70"></i>
-          <span className="text-white/70 text-sm">
-            Desliza para acercar/alejar
-          </span>
+          <div className="absolute bottom-8 flex items-center gap-2 bg-black/50 px-4 py-2 rounded-[20px]">
+            <i className="fa-solid fa-hand text-white/70"></i>
+            <span className="text-white/70 text-sm">
+              Desliza para acercar/alejar
+            </span>
+          </div>
         </div>
-      </div>
-    )}
-  </>
-);
+      )}
+    </>
+  );
 };
 
 export default DetalleFormula;
