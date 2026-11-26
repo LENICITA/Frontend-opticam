@@ -45,6 +45,17 @@ const DetalleFormula = () => {
 
   const cambiarCosto = async () => {
     try {
+      const check = validarAsignarPrecio({
+        id_formula: id_formula ? Number(id_formula) : undefined,
+        costo: costo,
+        estadoActualFormula: formula?.estado,
+      });
+
+      if (!check.valido) {
+        void alertError(check.mensaje || 'Datos inválidos');
+        return;
+      }
+
       setLoading(true);
 
       const resultadoCosto = await formulaController.actualizarCostoFormula(
@@ -82,17 +93,6 @@ const DetalleFormula = () => {
   };
 
   const handleConfirmarCosto = async () => {
-    const check = validarAsignarPrecio({
-      id_formula: id_formula ? Number(id_formula) : undefined,
-      costo: costo,
-      estadoActualFormula: formula?.estado,
-    });
-
-    if (!check.valido) {
-      void alertError(check.mensaje || 'Datos inválidos');
-      return;
-    }
-
     const esAprobado = formula?.estado === 'Aprobado';
 
     const confirmado = await alertConfirm({
@@ -103,9 +103,9 @@ const DetalleFormula = () => {
       confirmButtonText: esAprobado ? 'Sí, actualizar' : 'Sí, asignar y aprobar',
     });
 
-    if (confirmado) {
-      await cambiarCosto();
-    }
+    if (!confirmado) return;
+
+    await cambiarCosto();
   };
 
   const handleEditarCosto = async () => {
@@ -208,6 +208,7 @@ const DetalleFormula = () => {
     <>
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
         <div className="max-w-5xl mx-auto pb-10">
+
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-[#B90F0F] font-semibold mb-5 px-1 py-2 hover:opacity-80 transition"
@@ -234,6 +235,7 @@ const DetalleFormula = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
               <h3 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <i className="fa-solid fa-image text-[#B90F0F]"></i>
@@ -258,6 +260,7 @@ const DetalleFormula = () => {
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
+
               <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
                 <i className="fa-solid fa-circle-info text-[#B90F0F]"></i>
                 Información de la fórmula
