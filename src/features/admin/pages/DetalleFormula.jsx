@@ -144,7 +144,11 @@ const DetalleFormula = () => {
         <input
           type="text"
           value={costo}
-          onChange={(e) => setCosto(e.target.value.replace(/[^0-9]/g, ''))}
+          onChange={(e) => {
+            let valor = e.target.value.replace(/[^0-9]/g, '');
+            valor = valor.replace(/^0+/, ''); 
+            setCosto(valor);
+          }}
           placeholder="Ingrese el costo"
           className="w-[98%] h-12 border border-gray-300 rounded-lg px-4 mt-1 mb-2 outline-none mx-auto block"
         />
