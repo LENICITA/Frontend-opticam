@@ -40,20 +40,15 @@ export class ProductService {
 
   // ===== FILTRAR PRODUCTOS =====
   async filtrarProductos(filtros) {
-    const queryParams = new URLSearchParams();
-    
-    if (filtros.precio_min !== undefined && filtros.precio_min !== null && filtros.precio_min !== '') {
-      queryParams.append('precio_min', filtros.precio_min);
-    }
-    if (filtros.precio_max !== undefined && filtros.precio_max !== null && filtros.precio_max !== '') {
-      queryParams.append('precio_max', filtros.precio_max);
-    }
-    if (filtros.marca) queryParams.append('marca', filtros.marca);
-    if (filtros.color) queryParams.append('color', filtros.color);
-    if (filtros.material) queryParams.append('material', filtros.material);
-    if (filtros.id_categoria) queryParams.append('id_categoria', filtros.id_categoria);
+    const params = {};
+    if (filtros.precio_min !== undefined) params.precio_min = filtros.precio_min;
+    if (filtros.precio_max !== undefined) params.precio_max = filtros.precio_max;
+    if (filtros.marca) params.marca = filtros.marca;
+    if (filtros.color) params.color = filtros.color;
+    if (filtros.material) params.material = filtros.material;
+    if (filtros.id_categoria !== undefined) params.id_categoria = filtros.id_categoria;
 
-    const response = await apiClient.get(`/inventario/productos/filtros?${queryParams.toString()}`);
+    const response = await apiClient.get('/inventario/productos/filtros', { params });
     const data = response.data;
     if (!data.success) throw new Error(data.message || 'Error al filtrar productos');
     return ProductModel.fromJSONArray(data.productos || []);
