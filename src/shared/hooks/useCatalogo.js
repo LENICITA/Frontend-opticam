@@ -25,7 +25,6 @@ export const useCatalogo = () => {
   const [precioMin, setPrecioMin] = useState('');
   const [precioMax, setPrecioMax] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
-  const [filtrandoPrecio, setFiltrandoPrecio] = useState(false);
   const productosPorPagina = 9;
   const gridRef = useRef(null);
 
@@ -71,8 +70,6 @@ export const useCatalogo = () => {
   }, []);
 
   useEffect(() => {
-    if (filtrandoPrecio) return;
-    
     const texto = busqueda.trim();
 
     if (texto === '') {
@@ -98,7 +95,7 @@ export const useCatalogo = () => {
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [busqueda, productos, categoriaSeleccionada, ordenSeleccionado, filtrandoPrecio]);
+  }, [busqueda, productos, categoriaSeleccionada, ordenSeleccionado]);
 
   useEffect(() => { setPaginaActual(1); }, [busqueda, categoriaSeleccionada, marcaSeleccionada, ordenSeleccionado, precioMin, precioMax]);
 
@@ -134,12 +131,10 @@ export const useCatalogo = () => {
   const aplicarFiltrosAvanzados = async () => {
     try {
       setLoading(true);
-      setFiltrandoPrecio(true);
       const filtros = {};
       if (precioMin && !Number.isNaN(Number(precioMin))) filtros.precio_min = Number(precioMin);
       if (precioMax && !Number.isNaN(Number(precioMax))) filtros.precio_max = Number(precioMax);
-      const resultados = await productController.filtrarProductos(filtros);
-      setProductosFiltrados(resultados);
+      setProductosFiltrados(await productController.filtrarProductos(filtros));
       setMostrarFiltros(false);
     } catch (error) {
       console.error(error);
@@ -152,7 +147,6 @@ export const useCatalogo = () => {
   const limpiarFiltros = () => {
     setPrecioMin('');
     setPrecioMax('');
-    setFiltrandoPrecio(false);
     void cargarProductos();
     setMostrarFiltros(false);
   };
