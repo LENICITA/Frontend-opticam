@@ -31,7 +31,9 @@ export const MENSAJES_FORMULA = {
   ESTADO_INVALIDO: 'Estado inválido. Debe ser: Pendiente, Aprobado o Rechazado',
   FORMULA_RECHAZADA_SIN_PRECIO: 'No se puede asignar precio a una fórmula rechazada',
   ID_INVALIDO: 'ID de fórmula inválido',
-  TIPO_ARCHIVO_INVALIDO: 'El archivo debe ser una imagen'
+  TIPO_ARCHIVO_INVALIDO: 'El archivo debe ser una imagen',
+  COSTO_CEROS_IZQUIERDA: 'El costo no debe contener ceros a la izquierda (ej: 000111). Use un valor como 111 o 22000',
+  COSTO_DECIMAL_INVALIDO: 'El costo debe ser un número entero sin decimales',
 };
 
 // VALIDADORES BÁSICOS
@@ -47,7 +49,10 @@ export const validarObservaciones = (observaciones) => {
 
 export const validarCosto = (costo) => {
   if (costo === undefined || costo === null || costo === '') return false;
-  const num = Number(costo);
+  const costoStr = String(costo).trim();
+  if (!/^\d+$/.test(costoStr)) return false;
+  if (/^0\d+/.test(costoStr)) return false;
+  const num = Number(costoStr);
   return !Number.isNaN(num) && num > 0;
 };
 
@@ -170,13 +175,18 @@ export const checkCosto = (costo) => {
   if (costo === undefined || costo === null || costo === '') {
     return { valido: false, mensaje: MENSAJES_FORMULA.COSTO_REQUERIDO };
   }
-  const num = Number(costo);
-  if (Number.isNaN(num)) {
+  const costoStr = String(costo).trim();
+
+  if (!/^\d+$/.test(costoStr)) {
     return { valido: false, mensaje: MENSAJES_FORMULA.COSTO_INVALIDO };
   }
-  if (num < 0) {
-    return { valido: false, mensaje: MENSAJES_FORMULA.COSTO_NEGATIVO };
+
+  if (/^0\d+/.test(costoStr)) {
+    return { valido: false, mensaje: MENSAJES_FORMULA.COSTO_CEROS_IZQUIERDA };
   }
+
+  const num = Number(costoStr);
+  
   if (num === 0) {
     return { valido: false, mensaje: MENSAJES_FORMULA.COSTO_CERO };
   }
